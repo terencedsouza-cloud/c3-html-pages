@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ChargeZone — Wallet Cashback Expiry</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --primary:#BE210B;
+  --primary-dark:#4C0D04;
+  --primary-text:#1B1C1E;
+  --secondary-text:#4F4F4F;
+  --tertiary-text:#9A9A9A;
+  --gray-50:#F4F4F4;
+  --gray-100:#E2E2E2;
+  --gray-200:#BDBDBD;
+  --gray-800:#101010;
+  --white:#FFFFFF;
+  --blue:#1C64F2;
+  --success:#039884;
+  --gold:#FFCE6B;
+  --gold-muted:rgba(255,206,107,0.7);
+}
+body{
+  font-family:'Satoshi',-apple-system,sans-serif;
+  background:#0a0a0a;
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── Phone Shell ── */
+.device{
+  width:375px;
+  min-height:100vh;
+  position:relative;
+  background:linear-gradient(180deg,#101010 0%,#000 100%);
+  overflow-x:hidden;
+  overflow-y:auto;
+}
+
+/* Dark radial hero glow */
+.device::before{
+  content:'';
+  position:absolute;
+  top:-140px;left:-60px;
+  width:560px;height:560px;
+  background:radial-gradient(ellipse at 40% 40%,rgba(152,3,3,0.32) 0%,transparent 68%);
+  transform:rotate(18deg);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── Status Bar ── */
+.status-bar{
+  position:relative;z-index:2;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 20px 0;height:44px;
+}
+.status-bar .time{font-family:'SF Pro Display',-apple-system,sans-serif;font-weight:600;font-size:14px;color:#fff;letter-spacing:-0.28px}
+.status-icons{display:flex;gap:5px;align-items:center}
+
+/* ── Nav ── */
+.nav-header{
+  position:relative;z-index:2;
+  display:flex;align-items:center;gap:10px;
+  padding:16px 12px;
+}
+.back-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;width:24px;height:24px}
+.nav-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px;color:#fff;line-height:26px}
+
+.divider{height:0.5px;background:rgba(255,255,255,0.06);margin:0 20px;position:relative;z-index:2}
+
+/* ── Content ── */
+.content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;padding-top:4px;gap:20px}
+
+/* RFID Banner */
+.rfid{
+  width:334px;
+  background:#101010;
+  border-radius:8px;
+  padding:10px 12px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:-0.667px 0.667px 1.333px rgba(0,0,0,0.6),inset -0.667px 0.667px 1.333px rgba(255,255,255,0.12);
+}
+.rfid .ico{width:28px;height:28px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.rfid .body{flex:1}
+.rfid .row{display:flex;align-items:center;gap:8px}
+.rfid .lbl{font-weight:500;font-size:12px;color:#fff;line-height:20px}
+.rfid .badge{background:linear-gradient(126deg,#004309 4%,#00A912 50%,#004309 100%);border-radius:10px;padding:1px 6px;font-weight:700;font-size:10px;color:#fff;letter-spacing:0.2px;line-height:16px}
+.rfid .sub{font-size:12px;color:var(--gray-200);line-height:20px}
+.rfid .close{width:16px;height:16px;flex-shrink:0;cursor:pointer;opacity:0.4;background:none;border:none}
+
+/* Balance */
+.balance-area{width:334px;display:flex;flex-direction:column;gap:8px}
+.bal-label{display:flex;align-items:center;gap:4px;font-size:14px;color:#fff;line-height:22px;letter-spacing:0.28px}
+.bal-row{display:flex;align-items:center;justify-content:space-between}
+.bal-amt{font-weight:700;font-size:24px;line-height:32px;color:#fff}
+.bal-amt .sym{color:var(--gray-200)}
+.coins{display:flex;align-items:center;gap:4px;background:var(--primary-dark);border-radius:8px;padding:8px;box-shadow:-0.667px 0.667px 1.333px rgba(0,0,0,0.6),inset -0.667px 0.667px 1.333px rgba(255,255,255,0.12)}
+.coins span{font-size:14px;color:#fff;line-height:22px;letter-spacing:0.28px}
+.coins .caret{opacity:0.6;font-size:12px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CASHBACK EXPIRY — NEW ADDITIONS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Cashback Balance Strip */
+.cb-strip{
+  width:334px;
+  background:linear-gradient(90deg,rgba(208,182,122,0.06),rgba(106,93,62,0.06));
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(79,79,79,0.6);
+  border-radius:9px;
+  padding:10px 12px;
+}
+.cb-strip .top{font-size:10px;color:var(--gold-muted);letter-spacing:0.2px;line-height:16px;margin-bottom:2px}
+.cb-strip .mid{display:flex;align-items:center;gap:8px}
+.cb-strip .amt{font-weight:700;font-size:18px;color:var(--gold);line-height:26px;letter-spacing:0.36px}
+.cb-strip .hint{font-size:12px;color:var(--gold);line-height:20px}
+
+/* Expiring Soon Card */
+.expiry-card{
+  width:334px;
+  background:linear-gradient(135deg,rgba(255,206,107,0.07) 0%,rgba(190,33,11,0.04) 100%);
+  border:1px solid rgba(255,206,107,0.18);
+  border-radius:10px;
+  padding:14px;
+  position:relative;
+  overflow:hidden;
+}
+.expiry-card::after{
+  content:'';position:absolute;top:-24px;right:-24px;
+  width:90px;height:90px;
+  background:radial-gradient(circle,rgba(255,206,107,0.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.exp-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.exp-hdr .ttl{display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;color:var(--gold);letter-spacing:0.26px;line-height:20px}
+.exp-hdr .link{font-size:12px;color:var(--gold-muted);cursor:pointer;letter-spacing:0.2px}
+
+.exp-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.exp-row:last-child{border-bottom:none}
+.exp-left{display:flex;align-items:center;gap:10px}
+.exp-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.exp-ico.red{background:rgba(190,33,11,0.15)}
+.exp-ico.amber{background:rgba(255,206,107,0.12)}
+.exp-ico.dim{background:rgba(255,255,255,0.05)}
+.exp-amt{font-weight:700;font-size:14px;color:#fff;line-height:20px}
+.exp-time{font-size:11px;line-height:16px;letter-spacing:0.2px}
+.exp-time.red{color:#FF6B5A}
+.exp-time.amber{color:var(--gold)}
+.exp-time.dim{color:var(--tertiary-text)}
+.exp-bar{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:5px;overflow:hidden}
+.exp-bar .fill{height:100%;border-radius:2px}
+.exp-bar .fill.red{background:#FF6B5A}
+.exp-bar .fill.amber{background:var(--gold)}
+.exp-bar .fill.dim{background:rgba(255,255,255,0.12)}
+.exp-right{text-align:right;flex-shrink:0}
+.exp-right .dt{font-size:11px;color:var(--tertiary-text);line-height:16px}
+.exp-right .use{display:inline-flex;align-items:center;gap:2px;font-weight:700;font-size:11px;color:var(--primary);cursor:pointer;background:none;border:none;padding:0;margin-top:2px}
+
+/* Notification banner */
+.notif{
+  width:334px;
+  background:linear-gradient(135deg,rgba(255,107,90,0.1) 0%,rgba(190,33,11,0.05) 100%);
+  border:1px solid rgba(255,107,90,0.15);
+  border-radius:10px;
+  padding:10px 12px;
+  display:flex;align-items:center;gap:10px;
+}
+.notif .n-ico{width:28px;height:28px;border-radius:7px;background:rgba(255,107,90,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif .n-body{flex:1}
+.notif .n-ttl{font-weight:700;font-size:12px;color:#FF6B5A;line-height:18px}
+.notif .n-sub{font-size:11px;color:rgba(255,255,255,0.45);line-height:16px;margin-top:1px}
+.notif .n-cta{font-weight:700;font-size:11px;color:#FF6B5A;cursor:pointer;background:none;border:none;white-space:nowrap;letter-spacing:0.2px}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* Add Money */
+.add-btn{
+  width:334px;height:44px;
+  background:linear-gradient(90deg,#D24C39,#C6210A);
+  border:none;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  cursor:pointer;
+}
+.add-btn span{font-weight:700;font-size:16px;color:#fff}
+
+/* ── Bottom Sheet ── */
+.sheet{
+  background:#fff;
+  border-radius:20px 20px 0 0;
+  padding-top:12px;
+  margin-top:4px;
+  width:100%;
+}
+.handle{width:40px;height:4px;background:var(--gray-100);border-radius:2px;margin:0 auto 16px}
+
+.txn-hdr{display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:44px}
+.txn-hdr .hd{font-weight:700;font-size:18px;color:var(--primary-text);line-height:26px;letter-spacing:0.36px}
+.txn-hdr .flt{display:flex;align-items:center;gap:4px;background:none;border:none;cursor:pointer}
+.txn-hdr .flt span{font-weight:700;font-size:14px;color:var(--blue);line-height:22px;letter-spacing:0.28px;text-decoration:underline;text-underline-offset:3px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;padding:10px 20px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:4px;padding:4px 12px;height:30px;border-radius:90px;white-space:nowrap;font-size:14px;line-height:22px;letter-spacing:0.28px;color:var(--secondary-text);cursor:pointer;flex-shrink:0;background:none;border:none}
+.tab.on{background:#fff;box-shadow:-1.2px 1.2px 2.4px rgba(0,0,0,0.1);color:var(--primary);font-weight:500}
+
+/* Month */
+.mo{background:var(--gray-50);padding:8px 20px;font-weight:700;font-size:16px;color:var(--primary-text);line-height:24px;letter-spacing:0.32px}
+
+/* Transaction Rows */
+.tx{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(0,0,0,0.04)}
+.tx-ico{width:44px;height:44px;border-radius:8px;background:#FAFAFA;box-shadow:4px -4px 8px #fff,-2px 2px 4px rgba(0,0,0,0.1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tx-body{flex:1}
+.tx-top{display:flex;align-items:center;justify-content:space-between}
+.tx-name{font-weight:500;font-size:14px;color:var(--primary-text);line-height:22px}
+.tx-val{display:flex;align-items:center;gap:3px}
+.tx-amt{font-weight:500;font-size:14px;color:var(--primary-text);line-height:22px}
+.tx-dt{font-size:12px;color:var(--tertiary-text);line-height:20px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;border-radius:4px;padding:1px 5px;letter-spacing:0.2px;line-height:16px;margin-left:6px}
+.pill.gold{color:var(--gold);background:rgba(255,206,107,0.1)}
+.pill.blue{color:var(--blue);background:rgba(28,100,242,0.08)}
+.pill.red{color:var(--primary);background:rgba(190,33,11,0.06)}
+.credit{width:16px;height:16px;background:rgba(3,152,132,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.debit{width:16px;height:16px;background:rgba(190,33,11,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* Expired row */
+.tx.expired{opacity:0.5}
+.tx.expired .tx-ico{background:#FFF5F5}
+.tx.expired .tx-name{color:var(--tertiary-text);text-decoration:line-through;text-decoration-color:rgba(0,0,0,0.12)}
+.tx.expired .tx-amt{color:var(--tertiary-text);text-decoration:line-through;text-decoration-color:rgba(0,0,0,0.12)}
+
+/* ── Bottom Nav ── */
+.bnav{
+  position:sticky;bottom:0;left:0;
+  width:375px;background:#fff;
+  box-shadow:0 -2px 9px rgba(0,0,0,0.05);
+  padding:0 10px;z-index:10;
+}
+.bnav-row{display:flex;align-items:center;justify-content:space-between;padding:8px 12px 4px}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:2px;width:48px;background:none;border:none;cursor:pointer}
+.bnav-item .ico{width:24px;height:24px;display:flex;align-items:center;justify-content:center}
+.bnav-item .lbl{font-size:12px;color:var(--gray-200);line-height:16px}
+.bnav-item.on .lbl{color:var(--primary);font-weight:500}
+.home-ind{width:134px;height:5px;background:#000;border-radius:100px;margin:8px auto}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.65}}
+.pulse{animation:pulse 2s ease-in-out infinite}
+svg{display:block}
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="white"><rect x="0" y="3" width="3" height="9" rx="1" opacity=".4"/><rect x="4.5" y="2" width="3" height="10" rx="1" opacity=".6"/><rect x="9" y="1" width="3" height="11" rx="1" opacity=".8"/><rect x="13.5" width="3" height="12" rx="1"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="white"><path d="M8 3.6c-1.9 0-3.6.8-4.8 2L1.6 4C3.2 2.4 5.5 1.4 8 1.4s4.8 1 6.4 2.6l-1.6 1.6C11.6 4.4 9.9 3.6 8 3.6zm0 3.6c-1.1 0-2 .4-2.8 1.2L8 11.6l2.8-3.2C10 7.6 9.1 7.2 8 7.2z"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12"><rect x="0" y="0" width="22" height="12" rx="2.5" stroke="white" stroke-opacity=".35" fill="none"/><rect x="1.5" y="1.5" width="18" height="9" rx="1.5" fill="white"/><rect x="23" y="3.5" width="1.5" height="5" rx=".5" fill="white" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <div class="nav-header">
+    <button class="back-btn"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12l6-6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <span class="nav-title">Wallet</span>
+  </div>
+  <div class="divider"></div>
+
+  <!-- Main Content -->
+  <div class="content">
+
+    <!-- ⚠️ Expiry Notification -->
+    <div class="notif">
+      <div class="n-ico"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1a6 6 0 100 12A6 6 0 007 1zm0 9a.6.6 0 110-1.2.6.6 0 010 1.2zm.6-3a.6.6 0 01-1.2 0V4.6a.6.6 0 011.2 0V7z" fill="#FF6B5A"/></svg></div>
+      <div class="n-body">
+        <div class="n-ttl">₹30 cashback expires today!</div>
+        <div class="n-sub">Charge now before midnight to use it.</div>
+      </div>
+      <button class="n-cta">Charge →</button>
+    </div>
+
+    <!-- RFID Banner -->
+    <div class="rfid">
+      <div class="ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="7" width="22" height="14" rx="2" stroke="#9A9A9A" stroke-width="1.5"/><path d="M3 11h22" stroke="#9A9A9A" stroke-width="1.5"/><rect x="6" y="15" width="6" height="3" rx="1" fill="#9A9A9A" opacity=".4"/></svg></div>
+      <div class="body">
+        <div class="row"><span class="lbl">Apply for a free RFID card</span><span class="badge">New</span></div>
+        <span class="sub">You are now eligible for tap &amp; pay</span>
+      </div>
+      <button class="close"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <!-- Balance -->
+    <div class="balance-area">
+      <div class="bal-label">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="16" height="12" rx="2" stroke="#FFCE6B" stroke-width="1.4"/><circle cx="14" cy="10.5" r="1.5" fill="#FFCE6B" opacity=".6"/><path d="M2 8h16" stroke="#FFCE6B" stroke-width="1" opacity=".25"/></svg>
+        Total balance
+      </div>
+      <div class="bal-row">
+        <div class="bal-amt"><span class="sym">₹</span>1,77,567.98</div>
+        <div class="coins">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" fill="#FFD700" opacity=".9"/><circle cx="10" cy="10" r="4" fill="#FFA500" opacity=".5"/></svg>
+          <span>0 coins</span>
+          <span class="caret">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ━━━ CASHBACK BALANCE ━━━ -->
+    <div class="cb-strip">
+      <div class="top">Cashback balance</div>
+      <div class="mid">
+        <span class="amt">₹100</span>
+        <span class="hint">(₹30 Cashback expiring in 1 day)</span>
+      </div>
+    </div>
+
+    <!-- ━━━ EXPIRING SOON BREAKDOWN ━━━ -->
+    <div class="expiry-card">
+      <div class="exp-hdr">
+        <div class="ttl">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="#FFCE6B" stroke-width="1.2"/><path d="M7 4v3l2 1.5" stroke="#FFCE6B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Expiring Soon
+        </div>
+        <span class="link">View all ›</span>
+      </div>
+
+      <!-- Today — URGENT -->
+      <div class="exp-row">
+        <div class="exp-left">
+          <div class="exp-ico red pulse">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#FF6B5A" stroke-width="1.2"/><path d="M8 4.5v3.5l2 1.5" stroke="#FF6B5A" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="exp-amt">₹30</div>
+            <div class="exp-time red">Expires today at 11:59 PM</div>
+            <div class="exp-bar" style="width:120px"><div class="fill red" style="width:95%"></div></div>
+          </div>
+        </div>
+        <div class="exp-right">
+          <div class="dt">Earned 16 Mar</div>
+          <button class="use">Use now ›</button>
+        </div>
+      </div>
+
+      <!-- 2 days — WARNING -->
+      <div class="exp-row">
+        <div class="exp-left">
+          <div class="exp-ico amber">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#FFCE6B" stroke-width="1.2"/><path d="M8 4.5v3.5l2 1.5" stroke="#FFCE6B" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="exp-amt">₹20</div>
+            <div class="exp-time amber">Expires in 2 days</div>
+            <div class="exp-bar" style="width:120px"><div class="fill amber" style="width:70%"></div></div>
+          </div>
+        </div>
+        <div class="exp-right">
+          <div class="dt">Earned 18 Mar</div>
+          <button class="use">Use now ›</button>
+        </div>
+      </div>
+
+      <!-- 5 days — NORMAL -->
+      <div class="exp-row">
+        <div class="exp-left">
+          <div class="exp-ico dim">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="rgba(255,255,255,0.25)" stroke-width="1.2"/><path d="M8 4.5v3.5l2 1.5" stroke="rgba(255,255,255,0.25)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div class="exp-amt">₹50</div>
+            <div class="exp-time dim">Expires in 5 days</div>
+            <div class="exp-bar" style="width:120px"><div class="fill dim" style="width:28%"></div></div>
+          </div>
+        </div>
+        <div class="exp-right">
+          <div class="dt">Earned 21 Mar</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Money -->
+    <button class="add-btn">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Add Money</span>
+    </button>
+
+    <!-- ── Bottom Sheet ── -->
+    <div class="sheet">
+      <div class="handle"></div>
+
+      <div class="txn-hdr">
+        <span class="hd">Transactions</span>
+        <button class="flt">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="16" height="14" rx="2" stroke="#1C64F2" stroke-width="1.5"/><path d="M2 7h16" stroke="#1C64F2" stroke-width="1.2"/><circle cx="7" cy="7" r="1" fill="#1C64F2"/></svg>
+          <span>Filter</span>
+        </button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>All</button>
+        <button class="tab"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M5 1v4M11 1v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>Top-ups</button>
+        <button class="tab"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 6h12" stroke="currentColor" stroke-width="1.2"/></svg>Bookings</button>
+        <button class="tab on"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12.7 4.7A5.3 5.3 0 003.3 8h-2l2.7 2.7L6.7 8h-2a3.8 3.8 0 016.7-2.5l1.3-.8z" fill="currentColor" opacity=".8"/><path d="M14 5.3L11.3 8h2a3.8 3.8 0 01-6.7 2.5l-1.3.8A5.3 5.3 0 0014.7 8h-2L14 5.3z" fill="currentColor" opacity=".8"/></svg>Cashback</button>
+      </div>
+
+      <!-- March 2025 -->
+      <div class="mo">March 2025</div>
+
+      <!-- Cashback Earned — with expiry date -->
+      <div class="tx">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#039884" stroke-width="1.5"/><circle cx="18" cy="14" r="2" fill="#039884" opacity=".4"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Cashback Earned</span>
+            <div class="tx-val">
+              <span class="tx-amt" style="color:var(--success)">+₹50</span>
+              <div class="credit"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v6M2 5l3 3 3-3" stroke="#039884" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="tx-dt">21 Mar</span>
+            <span class="pill gold">Expires 28 Mar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cashback Used — FIFO -->
+      <div class="tx">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#1C64F2" stroke-width="1.5"/><circle cx="18" cy="14" r="2" fill="#1C64F2" opacity=".4"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Cashback Used</span>
+            <div class="tx-val">
+              <span class="tx-amt">−₹30</span>
+              <div class="debit"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="#BE210B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="tx-dt">20 Mar</span>
+            <span class="pill blue">FIFO applied</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cashback Earned -->
+      <div class="tx">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#039884" stroke-width="1.5"/><circle cx="18" cy="14" r="2" fill="#039884" opacity=".4"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Cashback Earned</span>
+            <div class="tx-val">
+              <span class="tx-amt" style="color:var(--success)">+₹20</span>
+              <div class="credit"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v6M2 5l3 3 3-3" stroke="#039884" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="tx-dt">18 Mar</span>
+            <span class="pill gold">Expires 25 Mar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expired Cashback -->
+      <div class="tx expired">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#BE210B" stroke-width="1.5" opacity=".5"/><line x1="7" y1="9" x2="21" y2="19" stroke="#BE210B" stroke-width="1" opacity=".35"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Cashback Expired</span>
+            <div class="tx-val">
+              <span class="tx-amt">₹50</span>
+              <span class="pill red"><svg width="8" height="8" viewBox="0 0 8 8" fill="none"><circle cx="4" cy="4" r="3" stroke="#BE210B" stroke-width=".8"/><path d="M2.8 2.8l2.4 2.4M5.2 2.8L2.8 5.2" stroke="#BE210B" stroke-width=".7"/></svg>Expired</span>
+            </div>
+          </div>
+          <span class="tx-dt">Expired on 8 Mar</span>
+        </div>
+      </div>
+
+      <!-- Cashback Partially Used -->
+      <div class="tx">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#1C64F2" stroke-width="1.5"/><circle cx="18" cy="14" r="2" fill="#1C64F2" opacity=".4"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Cashback Partially Used</span>
+            <div class="tx-val">
+              <span class="tx-amt">−₹20</span>
+              <div class="debit"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 8V2M2 5l3-3 3 3" stroke="#BE210B" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="tx-dt">5 Mar</span>
+            <span class="pill blue">₹30 remaining · Exp 12 Mar</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jan section -->
+      <div class="mo">January 2025</div>
+      <div class="tx">
+        <div class="tx-ico"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="6" width="20" height="16" rx="2.5" stroke="#9A9A9A" stroke-width="1.5"/><circle cx="18" cy="14" r="2" fill="#9A9A9A" opacity=".4"/></svg></div>
+        <div class="tx-body">
+          <div class="tx-top">
+            <span class="tx-name">Wallet Money Gifted</span>
+            <div class="tx-val">
+              <span class="tx-amt">₹200</span>
+              <div class="credit"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M5 2v6M2 5l3 3 3-3" stroke="#039884" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+          <span class="tx-dt">16 Jan</span>
+        </div>
+      </div>
+
+      <div style="height:100px"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bnav">
+    <div class="bnav-row">
+      <button class="bnav-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 10.5L12 3l9 7.5V21H3z" stroke="#BDBDBD" stroke-width="1.5"/></svg></div><span class="lbl">Home</span></button>
+      <button class="bnav-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="10" r="3" stroke="#BDBDBD" stroke-width="1.5"/><path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z" stroke="#BDBDBD" stroke-width="1.5"/></svg></div><span class="lbl">Plan trip</span></button>
+      <button class="bnav-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#BDBDBD" stroke-width="1.5"/><path d="M3 9h18M8 2v4M16 2v4" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="lbl">Bookings</span></button>
+      <button class="bnav-item on"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="2" stroke="#BE210B" stroke-width="1.8"/><circle cx="17" cy="12" r="2" fill="#BE210B" opacity=".4"/><path d="M2 9h20" stroke="#BE210B" stroke-width="1" opacity=".3"/></svg></div><span class="lbl">Wallet</span></button>
+      <button class="bnav-item"><div class="ico"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#BDBDBD" stroke-width="1.5"/><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="#BDBDBD" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="lbl">Profile</span></button>
+    </div>
+    <div class="home-ind"></div>
+  </div>
+
+</div>
+</body>
+</html>
