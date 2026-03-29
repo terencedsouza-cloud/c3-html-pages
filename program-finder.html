@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laptis — Program Finder</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --font:'Inter',sans-serif; --ls:-0.2px;
+  --t1:#1b1d20; --t2:#4e535a; --t3:#6b7280; --t-white:#fff;
+  --bg-page:#f8f9fa; --bg-nav:#f3f4f6; --white:#fff;
+  --border:#d7dbe0; --border-lt:rgba(215,219,224,.5);
+  --blue-50:#e8f1fb; --blue-100:#ccdaf6; --blue-400:#5293e5; --blue-500:#2e77d7;
+  --ok-50:#f0fdf4; --ok-200:#a7f3d0; --ok-300:#71d293; --ok-400:#17803c;
+  --warn-50:#fff4d9; --warn-400:#bc7000;
+  --info-50:#e3f0ff; --info-400:#1670bc;
+  --pur-50:#f6f0ff; --pur-400:#6e2eef;
+  --err-400:#991818;
+  --n-300:#cbcfd6;
+  --r12:12px; --r8:8px; --r6:6px; --r4:4px; --r99:9999px;
+  --sh-xs:0 1px 0.5px rgba(29,41,61,.02);
+  --sh-card:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh-modal:0 20px 40px rgba(0,0,0,.16),0 8px 16px rgba(0,0,0,.08);
+  --sh-dropdown:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;line-height:20px;letter-spacing:var(--ls);
+     background:var(--bg-page);color:var(--t1);-webkit-font-smoothing:antialiased}
+
+/* ── SHELL ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── NAV ── */
+.nav{width:250px;flex-shrink:0;background:var(--bg-nav);border-right:1px solid var(--border);
+     display:flex;flex-direction:column;gap:20px;padding:20px}
+.nav-logo{display:flex;align-items:center;gap:8px}
+.nav-wordmark{font-size:17px;font-weight:700;color:var(--blue-500);letter-spacing:-.4px}
+.nav-gem{width:32px;height:32px}
+.nav-divider{height:1px;background:var(--border)}
+.nav-group{display:flex;flex-direction:column;gap:4px;flex:1}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:var(--r8);
+          font-size:14px;color:var(--t2);cursor:pointer;transition:background .12s}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-item:hover{background:rgba(0,0,0,.04)}
+.nav-item.active{background:var(--blue-50)}
+.nav-item.active span{color:var(--blue-500);font-weight:500}
+.nav-bottom{display:flex;flex-direction:column;gap:16px}
+.nav-help{display:flex;align-items:center;gap:8px;padding:8px;font-size:14px;color:var(--t2);cursor:pointer;border-radius:var(--r4)}
+.nav-help svg{width:16px;height:16px}
+.nav-profile{display:flex;align-items:center;justify-content:space-between}
+.nav-avatar{width:40px;height:40px;border-radius:50%;background:#f0b10d;display:flex;
+            align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--t1)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0}
+.page-title{font-size:20px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r8);
+     font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;
+     font-family:var(--font);letter-spacing:var(--ls);white-space:nowrap;transition:all .12s}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-ghost{background:var(--white);color:var(--t2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--bg-page);color:var(--t1)}
+.btn-primary{background:var(--blue-500);color:#fff;border-color:var(--blue-500);box-shadow:var(--sh-xs)}
+.btn-primary:hover{background:#2565be}
+
+.content{padding:16px 24px;display:flex;flex-direction:column;gap:14px}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px}
+.search-wrap{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);
+             border-radius:var(--r8);padding:7px 12px;flex:1;max-width:340px}
+.search-wrap svg{width:15px;height:15px;color:var(--t3);flex-shrink:0}
+.search-wrap input{border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--t1);
+                   background:transparent;letter-spacing:var(--ls);flex:1}
+.search-wrap input::placeholder{color:var(--t3)}
+.btn-sm{padding:6px 12px;font-size:13px}
+.divider-v{width:1px;height:24px;background:var(--border)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r12);
+            overflow:hidden;box-shadow:var(--sh-card)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg-nav)}
+th{padding:10px 14px;font-size:11px;font-weight:600;color:var(--t2);text-align:left;
+   white-space:nowrap;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:14px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfc;cursor:pointer}
+.prog-name-cell .prog-name{font-weight:500;color:var(--t1)}
+.prog-name-cell .prog-sub{font-size:12px;color:var(--t3);margin-top:2px}
+.level-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:var(--r99);
+            font-size:11px;font-weight:500;white-space:nowrap}
+.lc-res{background:#f0f4ff;color:#3b4fd8;border:1px solid rgba(59,79,216,.15)}
+.lc-iop{background:var(--pur-50);color:var(--pur-400);border:1px solid rgba(110,46,239,.15)}
+.lc-php{background:var(--ok-50);color:var(--ok-400);border:1px solid rgba(23,128,60,.15)}
+.lc-det{background:#fff0f0;color:#c53030;border:1px solid rgba(197,48,48,.15)}
+.lc-op{background:var(--warn-50);color:var(--warn-400);border:1px solid rgba(188,112,0,.15)}
+.status-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:var(--r99);font-size:11px;font-weight:500}
+.s-acc{background:var(--ok-50);color:var(--ok-400);border:1px solid rgba(23,128,60,.2)}
+.s-acc::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok-400);flex-shrink:0}
+.s-wait{background:var(--warn-50);color:var(--warn-400);border:1px solid rgba(188,112,0,.2)}
+.s-wait::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--warn-400);flex-shrink:0}
+.view-link{color:var(--blue-500);font-size:13px;font-weight:500;cursor:pointer;text-decoration:none}
+.view-link:hover{text-decoration:underline}
+
+
+/* ══════════════════════════════════════════════
+   PROGRAM DETAILS MODAL
+══════════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:100;
+         display:flex;align-items:flex-start;justify-content:center;padding:32px 20px;
+         opacity:0;pointer-events:none;transition:opacity .2s;overflow-y:auto}
+.overlay.open{opacity:1;pointer-events:auto}
+
+
+.pmodal{background:var(--white);border-radius:var(--r12);width:660px;max-width:100%;
+        box-shadow:var(--sh-modal);display:flex;flex-direction:column;
+        transform:translateY(10px);transition:transform .22s;max-height:calc(100vh - 64px);overflow:hidden}
+.overlay.open .pmodal{transform:translateY(0)}
+
+/* Modal header */
+.pm-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--border);
+        display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0}
+.pm-title{font-size:18px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+.pm-updated{font-size:12px;color:var(--t3);margin-top:3px}
+.pm-hdr-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pm-close{width:32px;height:32px;border-radius:var(--r6);border:1px solid var(--border);
+          display:flex;align-items:center;justify-content:center;cursor:pointer;
+          color:var(--t3);background:var(--white);transition:all .12s}
+.pm-close:hover{background:var(--bg-page);color:var(--t1)}
+.pm-close svg{width:14px;height:14px}
+
+/* Scrollable body */
+.pm-body{overflow-y:auto;flex:1;padding:0 24px 20px}
+
+/* Sections */
+.pm-section{padding:20px 0;border-bottom:1px solid var(--border)}
+.pm-section:last-of-type{border-bottom:none}
+.pm-section-hdr{display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+                user-select:none;margin-bottom:0}
+.pm-section-hdr h3{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
+.pm-section-hdr .chevron{width:16px;height:16px;color:var(--t3);transition:transform .2s}
+.pm-section-hdr.collapsed .chevron{transform:rotate(-90deg)}
+.pm-section-body{margin-top:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.pm-section-body.single{grid-template-columns:1fr}
+.pm-section-body.two{grid-template-columns:1fr 1fr}
+.pm-field{}
+.pm-field-label{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;
+                letter-spacing:.04em;margin-bottom:4px}
+.pm-field-val{font-size:14px;color:var(--t1);line-height:20px}
+.pm-field-val.link{color:var(--blue-500);cursor:pointer}
+.pm-field-val.link:hover{text-decoration:underline}
+
+/* Chips in modal */
+.ref-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:var(--r99);
+          font-size:12px;font-weight:500}
+.ref-chip.green{background:var(--ok-50);color:var(--ok-400);border:1px solid rgba(23,128,60,.2)}
+.ref-chip.green::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok-400)}
+.ref-chip.blue{background:var(--blue-50);color:var(--blue-500);border:1px solid var(--blue-100)}
+
+/* Extras list */
+.extras-list{display:flex;flex-wrap:wrap;gap:8px}
+.extra-tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+           border-radius:var(--r99);border:1px solid var(--border);background:var(--bg-page);
+           font-size:12px;color:var(--t2)}
+.extra-tag svg{width:12px;height:12px;color:var(--ok-400)}
+
+/* ── "See something incorrect" footer ── */
+.pm-report-footer{flex-shrink:0;padding:14px 24px;border-top:1px solid var(--border);
+                  display:flex;align-items:center;justify-content:center;background:var(--bg-page)}
+.report-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--t3);
+             cursor:pointer;border-radius:var(--r4);padding:4px 8px;transition:all .12s;
+             text-decoration:none}
+.report-link:hover{color:var(--t2);background:rgba(0,0,0,.04)}
+.report-link svg{width:14px;height:14px;flex-shrink:0}
+.report-link span{border-bottom:1px dashed var(--n-300);padding-bottom:1px;transition:border-color .12s}
+.report-link:hover span{border-color:var(--t2)}
+
+/* ── In-place view swap ── */
+.pm-view{display:flex;flex-direction:column;flex:1;min-height:0;
+         transition:opacity .18s;overflow:hidden}
+.pm-view.hidden{opacity:0;pointer-events:none;position:absolute;inset:0;z-index:-1}
+
+/* ── Report view header ── */
+.pm-rpt-hdr{padding:16px 24px;border-bottom:1px solid var(--border);flex-shrink:0;
+            display:flex;align-items:center;justify-content:space-between;gap:12px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;
+           color:var(--t2);cursor:pointer;padding:5px 8px;border-radius:var(--r6);
+           border:1px solid var(--border);background:var(--white);transition:all .12s}
+.back-link:hover{background:var(--bg-page);color:var(--t1)}
+.back-link svg{width:14px;height:14px}
+.pm-rpt-hdr-center{flex:1;display:flex;align-items:center;gap:10px;padding:0 12px}
+.rpt-icon{width:32px;height:32px;border-radius:var(--r6);background:var(--warn-50);
+          border:1px solid rgba(188,112,0,.2);display:flex;align-items:center;
+          justify-content:center;flex-shrink:0}
+.rpt-icon svg{width:15px;height:15px;color:var(--warn-400)}
+.rpt-hdr-text{}
+.rpt-title{font-size:15px;font-weight:600;color:var(--t1);letter-spacing:-.2px}
+.rpt-sub{font-size:12px;color:var(--t3);margin-top:1px}
+
+/* Report body */
+.rm-body{padding:18px 24px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;flex:1}
+
+/* Prog ref pill */
+.rm-prog-pill{display:flex;align-items:center;gap:8px;padding:9px 12px;
+              background:var(--bg-page);border:1px solid var(--border);border-radius:var(--r8)}
+.rm-prog-pill svg{width:14px;height:14px;color:var(--t3);flex-shrink:0}
+.rm-prog-pill span{font-size:13px;font-weight:500;color:var(--t1)}
+
+/* Field */
+.rm-field{}
+.rm-label{font-size:12px;font-weight:500;color:var(--t2);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.rm-label .req{color:var(--err-400)}
+
+/* Checkbox multi-select */
+.rm-checks{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rm-check{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r6);
+          border:1px solid var(--border);background:var(--white);cursor:pointer;
+          font-size:13px;color:var(--t1);transition:all .12s;user-select:none}
+.rm-check:hover{border-color:var(--blue-400);background:var(--blue-50)}
+.rm-check.checked{border-color:var(--blue-400);background:var(--blue-50);color:var(--blue-500);font-weight:500}
+.rm-check-box{width:15px;height:15px;border-radius:var(--r4);border:1.5px solid var(--n-300);
+              background:var(--white);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rm-check.checked .rm-check-box{background:var(--blue-500);border-color:var(--blue-500)}
+.rm-check-box svg{width:9px;height:9px;color:#fff;display:none}
+.rm-check.checked .rm-check-box svg{display:block}
+
+/* Textarea */
+.rm-textarea{width:100%;border:1px solid var(--border);border-radius:var(--r8);
+             padding:9px 12px;font-family:var(--font);font-size:14px;color:var(--t1);
+             letter-spacing:var(--ls);resize:vertical;min-height:80px;outline:none;
+             transition:border-color .12s;line-height:20px;background:var(--bg-page)}
+.rm-textarea::placeholder{color:var(--t3)}
+.rm-textarea:focus{border-color:var(--blue-400);box-shadow:0 0 0 3px var(--blue-50);background:var(--white)}
+
+/* Privacy note */
+.rm-privacy{display:flex;align-items:flex-start;gap:7px;font-size:12px;color:var(--t3);line-height:17px}
+.rm-privacy svg{width:12px;height:12px;flex-shrink:0;margin-top:2px}
+
+.rm-footer{padding:14px 24px;border-top:1px solid var(--border);
+           display:flex;justify-content:flex-end;gap:8px}
+.btn-cancel{background:var(--white);color:var(--t2);border:1px solid var(--border)}
+.btn-cancel:hover{background:var(--bg-page);color:var(--t1)}
+.btn-submit{background:var(--blue-500);color:#fff;border-color:var(--blue-500);opacity:.5;pointer-events:none}
+.btn-submit.enabled{opacity:1;pointer-events:auto}
+.btn-submit.enabled:hover{background:#2565be}
+
+/* ══════════════════════════════════════════════
+   SUPPORT MODAL
+══════════════════════════════════════════════ */
+.support-modal {
+  background: var(--bg-page);
+  border: 1px solid #adb3bc;
+  border-radius: var(--r12);
+  width: 507px; max-width: calc(100vw - 40px);
+  box-shadow: var(--sh-modal);
+  transform: translateY(8px); transition: transform .22s;
+  overflow: hidden;
+}
+.overlay.open .support-modal { transform: translateY(0); }
+
+.support-hdr {
+  background: var(--bg-page);
+  border-bottom: 1px solid var(--border);
+  padding: 20px;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.support-hdr-text {}
+.support-title { font-size: 20px; font-weight: 600; color: var(--t1); line-height: 28px; letter-spacing: -.3px; }
+.support-sub { font-size: 14px; color: var(--t2); line-height: 22px; margin-top: 4px; }
+
+.support-grid {
+  padding: 20px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.support-card {
+  border: 1px solid #adb3bc;
+  border-radius: var(--r12);
+  padding: 24px 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  cursor: pointer; text-decoration: none;
+  transition: border-color .15s, background .15s, box-shadow .15s;
+  background: var(--white);
+}
+.support-card:hover {
+  border-color: var(--blue-400);
+  background: var(--blue-50);
+  box-shadow: 0 2px 8px rgba(46,119,215,.1);
+}
+.support-card-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--blue-50); border: 1px solid var(--blue-100);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  transition: background .15s;
+}
+.support-card:hover .support-card-icon { background: var(--blue-100); }
+.support-card-icon svg { width: 24px; height: 24px; color: var(--blue-500); }
+.support-card-body { text-align: center; }
+.support-card-title { font-size: 16px; font-weight: 600; color: var(--t1); letter-spacing: -.2px; line-height: 24px; }
+.support-card-desc { font-size: 14px; font-weight: 500; color: var(--t2); margin-top: 3px; line-height: 20px; }
+
+/* ── SUCCESS TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;z-index:300;
+       background:var(--t1);color:#fff;border-radius:var(--r8);
+       padding:12px 16px;font-size:13px;font-weight:500;
+       display:flex;align-items:center;gap:8px;box-shadow:var(--sh-dropdown);
+       transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:15px;height:15px;color:var(--ok-300)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <svg class="nav-gem" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#2e77d7"/>
+        <path d="M16 6L24 12V20L16 26L8 20V12L16 6Z" fill="white" fill-opacity=".3"/>
+        <path d="M16 6L24 12H8L16 6Z" fill="white" fill-opacity=".7"/>
+        <path d="M8 12L16 26L8 20V12Z" fill="white" fill-opacity=".4"/>
+        <path d="M24 12L16 26L24 20V12Z" fill="white" fill-opacity=".55"/>
+      </svg>
+      <span class="nav-wordmark">Laptis</span>
+    </div>
+    <div class="nav-divider"></div>
+    <div class="nav-group">
+      <div class="nav-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span>Program Finder</span>
+      </div>
+      <div class="nav-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        <span>Dashboard</span>
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <div class="nav-divider"></div>
+      <div class="nav-help" onclick="openSupport()" style="cursor:pointer">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Need Help?
+      </div>
+      <div class="nav-profile">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="nav-avatar">AH</div>
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--t1)">Alex Hemsworth</div>
+            <div style="font-size:12px;color:var(--t2)">Admin</div>
+          </div>
+        </div>
+        <svg width="16" height="16" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="page-hdr">
+      <div class="page-title">Program Finder</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+          Filters
+        </button>
+        <button class="btn btn-primary btn-sm">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add to Case
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search programs…">
+        </div>
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+          Level of Care
+        </button>
+        <button class="btn btn-ghost btn-sm">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Location
+        </button>
+        <button class="btn btn-ghost btn-sm">Insurance</button>
+        <div class="divider-v"></div>
+        <span style="font-size:13px;color:var(--t3)">847 programs found</span>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Program Name</th>
+              <th>Level of Care</th>
+              <th>Location</th>
+              <th>Accepting Referrals</th>
+              <th>Insurance</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr onclick="openDetail('ironwood')">
+              <td class="prog-name-cell">
+                <div class="prog-name">Ironwood Institute</div>
+                <div class="prog-sub">Ironwood Health Group</div>
+              </td>
+              <td><span class="level-chip lc-det">Inpatient Detox (4.0)</span></td>
+              <td>Petersham, MA</td>
+              <td><span class="status-chip s-acc">Accepting Referrals</span></td>
+              <td style="font-size:13px;color:var(--t2)">MassHealth, Medicare</td>
+              <td><a class="view-link">View Details →</a></td>
+            </tr>
+            <tr onclick="openDetail('ironwood')">
+              <td class="prog-name-cell">
+                <div class="prog-name">New Horizons Recovery Institute</div>
+                <div class="prog-sub">New Horizons Health Group</div>
+              </td>
+              <td><span class="level-chip lc-res">Residential (3.1)</span></td>
+              <td>Atlanta, GA</td>
+              <td><span class="status-chip s-acc">Accepting Referrals</span></td>
+              <td style="font-size:13px;color:var(--t2)">BCBS, Cigna, Aetna</td>
+              <td><a class="view-link">View Details →</a></td>
+            </tr>
+            <tr onclick="openDetail('ironwood')">
+              <td class="prog-name-cell">
+                <div class="prog-name">Cedar Ridge Recovery Center</div>
+                <div class="prog-sub">Cedar Ridge Health Systems</div>
+              </td>
+              <td><span class="level-chip lc-iop">IOP (2.1)</span></td>
+              <td>Nashville, TN</td>
+              <td><span class="status-chip s-wait">Waitlist</span></td>
+              <td style="font-size:13px;color:var(--t2)">Medicaid, Self Pay</td>
+              <td><a class="view-link">View Details →</a></td>
+            </tr>
+            <tr onclick="openDetail('ironwood')">
+              <td class="prog-name-cell">
+                <div class="prog-name">Evergreen Wellness & Recovery</div>
+                <div class="prog-sub">Evergreen Care Partners</div>
+              </td>
+              <td><span class="level-chip lc-php">PHP (2.5)</span></td>
+              <td>Portland, OR</td>
+              <td><span class="status-chip s-acc">Accepting Referrals</span></td>
+              <td style="font-size:13px;color:var(--t2)">CARF, Medicare</td>
+              <td><a class="view-link">View Details →</a></td>
+            </tr>
+            <tr onclick="openDetail('ironwood')">
+              <td class="prog-name-cell">
+                <div class="prog-name">Lakeside Treatment Center</div>
+                <div class="prog-sub">Lakeside Behavioral Health</div>
+              </td>
+              <td><span class="level-chip lc-op">Outpatient (1.0)</span></td>
+              <td>Austin, TX</td>
+              <td><span class="status-chip s-acc">Accepting Referrals</span></td>
+              <td style="font-size:13px;color:var(--t2)">UnitedHealth, Aetna</td>
+              <td><a class="view-link">View Details →</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════
+     PROGRAM DETAILS MODAL
+══════════════════════════════ -->
+<div class="overlay" id="detail-overlay" onclick="handleDetailOverlayClick(event)">
+  <div class="pmodal" id="detail-modal" style="position:relative">
+
+    <!-- ── DETAIL VIEW ── -->
+    <div class="pm-view" id="pm-detail-view">
+
+    <!-- Header -->
+    <div class="pm-hdr">
+      <div>
+        <div class="pm-title">Ironwood Institute</div>
+        <div class="pm-updated">Last updated on March 03, 2025, 12:00PM</div>
+      </div>
+      <div class="pm-hdr-right">
+        <button class="btn btn-primary btn-sm">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add to Case
+        </button>
+        <div class="pm-close" onclick="closeDetail()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="pm-body">
+
+      <!-- Program Overview -->
+      <div class="pm-section">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Program Overview</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body">
+          <div class="pm-field" style="grid-column:1/3">
+            <div class="pm-field-label">Location</div>
+            <div class="pm-field-val">211 North Main Street<br>Petersham, MA 01366</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Level of Care</div>
+            <div class="pm-field-val"><span class="level-chip lc-det">Inpatient Detox (4.0)</span></div>
+          </div>
+          <div class="pm-field" style="grid-column:1/3">
+            <div class="pm-field-label">Accepting Referrals</div>
+            <div class="pm-field-val"><span class="ref-chip green">Accepting Referrals</span></div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Verification Status</div>
+            <div class="pm-field-val">Verified</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Information -->
+      <div class="pm-section">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Contact Information</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body">
+          <div class="pm-field">
+            <div class="pm-field-label">Phone Number</div>
+            <div class="pm-field-val">+1 (312) 555-0101</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Email</div>
+            <div class="pm-field-val link">adms@ironwoodinst.com</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Website</div>
+            <div class="pm-field-val link">www.IronwoodInstitute.com</div>
+          </div>
+          <div class="pm-field" style="grid-column:1/3">
+            <div class="pm-field-label">Operating Hours</div>
+            <div class="pm-field-val">Mon – Fri (8AM – 9PM); Sat – Sun closed</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Fax Number</div>
+            <div class="pm-field-val">999999999</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demographics -->
+      <div class="pm-section">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Demographics and Accommodations</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body two">
+          <div class="pm-field">
+            <div class="pm-field-label">Age Range</div>
+            <div class="pm-field-val">18 – 60</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Genders Allowed</div>
+            <div class="pm-field-val">Male, Female, Non-Binary, Transgender, Other, Prefer Not to Say</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insurance -->
+      <div class="pm-section">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Insurance Accepted</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body single">
+          <div class="pm-field">
+            <div class="pm-field-label">Medicaid</div>
+            <div class="pm-field-val">MassHealth – BMC, MassHealth – FFS, MassHealth – MBHP</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Medicare</div>
+            <div class="pm-field-val">MassHealth Secondary, MassHealth – BMC, MassHealth – Tufts, UnitedHealthCare</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Commercial Insurance</div>
+            <div class="pm-field-val">Beacon Health Options, Allways, Unicare, Cigna, Tufts Commercial, Wellsense Commercial, Tricare</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Other</div>
+            <div class="pm-field-val">Self Pay, Uninsured, Other</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div class="pm-section">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Services and Treatment</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body single">
+          <div class="pm-field">
+            <div class="pm-field-label">Substances Treated</div>
+            <div class="pm-field-val">Alcohol, Opioids, Benzos, Marijuana</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Co-Occurring Disorders Allowed</div>
+            <div class="pm-field-val">Anxiety, Depression, Post-Traumatic Stress Disorder (PTSD), Schizophrenia</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Medications Administered</div>
+            <div class="pm-field-val">Librium, Valium, Suboxone, Vivitrol, Narcan</div>
+          </div>
+          <div class="pm-field">
+            <div class="pm-field-label">Pharmacy on Site</div>
+            <div class="pm-field-val">Yes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extras -->
+      <div class="pm-section" style="border-bottom:none">
+        <div class="pm-section-hdr" onclick="toggleSection(this)">
+          <h3>Extras</h3>
+          <svg class="chevron" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+        </div>
+        <div class="pm-section-body single" style="margin-top:14px">
+          <div class="extras-list">
+            <div class="extra-tag">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Accepts Uninsured
+            </div>
+            <div class="extra-tag">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Telehealth Available
+            </div>
+            <div class="extra-tag">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Transportation Assistance
+            </div>
+            <div class="extra-tag">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              On-Site Pharmacy
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pm-body -->
+
+    <!-- ── "See something incorrect or missing?" footer link ── -->
+    <div class="pm-report-footer">
+      <a class="report-link" onclick="openReport(event)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>See something incorrect or missing? Let us know</span>
+      </a>
+    </div>
+
+    </div><!-- /pm-detail-view -->
+
+    <!-- ── REPORT VIEW (hidden initially) ── -->
+    <div class="pm-view hidden" id="pm-report-view">
+
+      <!-- Report header -->
+      <div class="pm-rpt-hdr">
+        <div class="back-link" onclick="closeReport()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </div>
+        <div class="pm-rpt-hdr-center">
+          <div class="rpt-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <div class="rpt-hdr-text">
+            <div class="rpt-title">Report an issue</div>
+            <div class="rpt-sub">Ironwood Institute</div>
+          </div>
+        </div>
+        <div class="pm-close" onclick="closeDetail()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+
+      <!-- Report body -->
+      <div class="rm-body">
+
+        <!-- What's incorrect -->
+        <div class="rm-field">
+          <div class="rm-label">What looks incorrect or missing? <span class="req">*</span></div>
+          <div class="rm-checks" id="rm-checks">
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Contact Information
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Location / Address
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Level of Care
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Insurance / Payment
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Services & Treatment
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Demographics
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Accepting Referrals status
+            </div>
+            <div class="rm-check" onclick="toggleCheck(this)">
+              <div class="rm-check-box"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+              Other
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="rm-field">
+          <div class="rm-label">Additional details <span style="color:var(--t3);font-weight:400">(optional)</span></div>
+          <textarea class="rm-textarea" placeholder="Describe what looks wrong or what's missing…" id="rm-notes"></textarea>
+        </div>
+
+        <!-- Privacy note -->
+        <div class="rm-privacy">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          Your feedback is shared with our data team and the program to help keep information accurate. We won't share your name without permission.
+        </div>
+
+      </div>
+
+      <!-- Report footer -->
+      <div class="rm-footer">
+        <button class="btn btn-cancel" onclick="closeReport()">Cancel</button>
+        <button class="btn btn-submit" id="rm-submit-btn" onclick="submitReport()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Send Report
+        </button>
+      </div>
+
+    </div><!-- /pm-report-view -->
+
+  </div><!-- /pmodal -->
+</div><!-- /detail-overlay -->
+
+<!-- ══ SUPPORT MODAL ══ -->
+<div class="overlay" id="support-overlay" onclick="handleSupportOverlayClick(event)">
+  <div class="support-modal">
+    <div class="support-hdr">
+      <div class="support-hdr-text">
+        <div class="support-title">How Can We Help?</div>
+        <div class="support-sub">We're here to support you. Choose the option that works best for you.</div>
+      </div>
+      <div class="pm-close" onclick="closeSupport()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="support-grid">
+
+      <!-- Call -->
+      <a class="support-card" href="tel:6172130356" onclick="closeSupport()">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.88 10.4a19.79 19.79 0 01-3.07-8.68A2 2 0 012.79 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.76a16 16 0 006.29 6.29l1.12-1.12a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+            <path d="M14.05 3a9 9 0 010 18M14.05 7a5 5 0 010 10" opacity=".4"/>
+          </svg>
+        </div>
+        <div class="support-card-body">
+          <div class="support-card-title">Give Us a Call</div>
+          <div class="support-card-desc">617-213-0356</div>
+        </div>
+      </a>
+
+      <!-- Email -->
+      <a class="support-card" href="mailto:hello@laptis.io" onclick="closeSupport()">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div class="support-card-body">
+          <div class="support-card-title">Send Us an Email</div>
+          <div class="support-card-desc">hello@laptis.io</div>
+        </div>
+      </a>
+
+      <!-- Feedback -->
+      <a class="support-card" href="#" onclick="closeSupport();return false;">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            <line x1="9" y1="10" x2="15" y2="10" opacity=".6"/>
+            <line x1="9" y1="14" x2="13" y2="14" opacity=".6"/>
+          </svg>
+        </div>
+        <div class="support-card-body">
+          <div class="support-card-title">Share Feedback</div>
+          <div class="support-card-desc">Tell us what you think</div>
+        </div>
+      </a>
+
+      <!-- Help Center -->
+      <a class="support-card" href="#" target="_blank" onclick="closeSupport();return false;">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            <line x1="9" y1="7" x2="15" y2="7" opacity=".5"/>
+            <line x1="9" y1="11" x2="15" y2="11" opacity=".5"/>
+          </svg>
+        </div>
+        <div class="support-card-body">
+          <div class="support-card-title">Help Center</div>
+          <div class="support-card-desc">Browse guides &amp; FAQs</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-text">Report sent — thank you for helping us improve.</span>
+</div>
+
+
+<script>
+// ── Section toggle ──────────────────────────────────────────
+function toggleSection(hdr) {
+  const body = hdr.nextElementSibling;
+  hdr.classList.toggle('collapsed');
+  body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+
+// ── Program Details Modal ───────────────────────────────────
+function openDetail(id) {
+  // Ensure detail view is showing, report is hidden
+  showView('detail');
+  document.getElementById('detail-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // Reset report form after overlay fades
+  setTimeout(resetReportForm, 220);
+}
+
+function handleDetailOverlayClick(e) {
+  if (e.target === document.getElementById('detail-overlay')) closeDetail();
+}
+
+// ── In-place view swap ─────────────────────────────────────
+function showView(which) {
+  const detailView = document.getElementById('pm-detail-view');
+  const reportView = document.getElementById('pm-report-view');
+  if (which === 'report') {
+    detailView.classList.add('hidden');
+    reportView.classList.remove('hidden');
+    // Scroll the report body to top
+    const body = reportView.querySelector('.rm-body');
+    if (body) body.scrollTop = 0;
+  } else {
+    reportView.classList.add('hidden');
+    detailView.classList.remove('hidden');
+  }
+}
+
+// ── Report view ─────────────────────────────────────────────
+function openReport(e) {
+  e.stopPropagation();
+  showView('report');
+}
+
+function closeReport() {
+  showView('detail');
+  resetReportForm();
+}
+
+// Close report if clicking outside the rmodal
+document.getElementById('report-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeReport();
+});
+
+// ── Checkboxes ──────────────────────────────────────────────
+let checkedCount = 0;
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  checkedCount = document.querySelectorAll('.rm-check.checked').length;
+  const btn = document.getElementById('rm-submit-btn');
+  if (checkedCount > 0) btn.classList.add('enabled');
+  else btn.classList.remove('enabled');
+}
+
+// ── Submit ──────────────────────────────────────────────────
+function submitReport() {
+  if (!document.querySelector('.rm-check.checked')) return;
+  closeDetail();
+  showToast('Report sent — thank you for helping us improve.');
+}
+
+function resetReportForm() {
+  document.querySelectorAll('.rm-check').forEach(c => c.classList.remove('checked'));
+  const notes = document.getElementById('rm-notes');
+  if (notes) notes.value = '';
+  const btn = document.getElementById('rm-submit-btn');
+  if (btn) btn.classList.remove('enabled');
+}
+
+// ── Support modal ───────────────────────────────────────────
+function openSupport() {
+  document.getElementById('support-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSupport() {
+  document.getElementById('support-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function handleSupportOverlayClick(e) {
+  if (e.target === document.getElementById('support-overlay')) closeSupport();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>

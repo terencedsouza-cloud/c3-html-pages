@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laptis — Clinic Onboarding · Program Selection</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --font: 'Inter', sans-serif;
+  --ls: -0.2px;
+  --t1: #1b1d20; --t2: #4e535a; --t3: #6b7280; --t-dis: #8e95a3; --t-white: #fff;
+  --bg-page: #f8f9fa; --bg-nav: #f3f4f6; --white: #fff;
+  --border: #d7dbe0; --border-lt: rgba(215,219,224,.5);
+  --blue-50: #e8f1fb; --blue-100: #d0e4f8; --blue-400: #5293e5; --blue-500: #2e77d7;
+  --ok-50: #e3f6eb; --ok-200: #a7f3d0; --ok-300: #71d293; --ok-400: #17803c;
+  --warn-50: #fff4d9; --warn-400: #bc7000;
+  --info-50: #e3f0ff; --info-400: #1670bc;
+  --pur-50: #f6f0ff; --pur-400: #6e2eef;
+  --err-400: #991818;
+  --n-300: #cbcfd6;
+  --r12: 12px; --r8: 8px; --r6: 6px; --r4: 4px; --r99: 9999px;
+  --sh-xs: 0 1px 0.5px rgba(29,41,61,.02);
+  --sh-card: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --sh-dropdown: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;line-height:20px;letter-spacing:var(--ls);
+     background:var(--bg-page);color:var(--t1);-webkit-font-smoothing:antialiased}
+
+/* ── LAYOUT ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── LEFT NAV / STEPPER ── */
+.nav{width:250px;flex-shrink:0;background:var(--bg-nav);border-right:1px solid var(--border);
+     display:flex;flex-direction:column;gap:20px;padding:20px}
+.nav-logo{display:flex;align-items:center;justify-content:space-between}
+.nav-wordmark{font-size:17px;font-weight:700;color:var(--blue-500);letter-spacing:-.4px}
+.nav-gem{width:32px;height:32px}
+.nav-collapse{width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+              cursor:pointer;border-radius:var(--r4);color:var(--t3)}
+.nav-divider{height:1px;background:var(--border);width:100%}
+
+/* Stepper */
+.stepper{display:flex;flex-direction:column;gap:0;flex:1;overflow-y:auto;padding:8px 0}
+.step-row{display:flex;align-items:flex-start;gap:0;position:relative;min-height:40px}
+.step-spine{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;padding-top:4px}
+.step-dot{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);flex-shrink:0;
+          display:flex;align-items:center;justify-content:center}
+.step-dot.done{background:var(--ok-50);border-color:var(--ok-400)}
+.step-dot.done svg{display:block}
+.step-dot svg{display:none;width:10px;height:10px;color:var(--ok-400)}
+.step-dot.active{border-color:var(--blue-500);background:var(--white);box-shadow:0 0 0 3px var(--blue-50)}
+.step-line{width:1.5px;flex:1;background:var(--border);min-height:16px}
+.step-line.done{background:var(--blue-500)}
+.step-content{flex:1;padding:2px 0 20px 4px}
+.step-label{font-size:14px;font-weight:500;line-height:20px;color:var(--t2);cursor:pointer;
+            display:flex;align-items:center;gap:6px}
+.step-label.active{color:var(--blue-500)}
+.step-label.done{color:var(--t2)}
+.step-sub{display:flex;flex-direction:column;gap:2px;margin-top:6px;padding-left:0}
+.step-sub-item{font-size:13px;color:var(--t3);line-height:22px;cursor:pointer;padding:2px 0}
+.step-sub-item:hover{color:var(--t2)}
+.step-sub-item.active{color:var(--blue-500);font-weight:500}
+
+.nav-bottom{display:flex;flex-direction:column;gap:16px}
+.nav-help{display:flex;align-items:center;gap:8px;padding:8px;font-size:14px;color:var(--t2);
+          cursor:pointer;border-radius:var(--r4)}
+.nav-help svg{width:16px;height:16px}
+.nav-profile{display:flex;align-items:center;justify-content:space-between}
+.nav-avatar{width:40px;height:40px;border-radius:50%;background:#f0b10d;
+            display:flex;align-items:center;justify-content:center;
+            font-size:13px;font-weight:600;color:var(--t1);flex-shrink:0}
+.nav-name{font-size:14px;font-weight:500;color:var(--t1)}
+.nav-role{font-size:12px;color:var(--t2)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+
+/* Page header */
+.page-hdr{background:var(--bg-nav);border-bottom:1px solid var(--border);
+          display:flex;align-items:center;gap:16px;padding:16px 24px;height:64px}
+.back-btn{width:28px;height:28px;border-radius:var(--r6);display:flex;align-items:center;
+          justify-content:center;cursor:pointer;color:var(--t3);border:1px solid transparent}
+.back-btn:hover{background:var(--border)}
+.back-btn svg{width:16px;height:16px}
+.page-title{font-size:18px;font-weight:600;color:var(--t1);letter-spacing:-.3px}
+
+/* Section header */
+.section-hdr{border-bottom:1.5px solid var(--border);padding:20px 24px;
+             display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.section-title{font-size:20px;font-weight:600;color:var(--t1);letter-spacing:-.3px;line-height:28px}
+.section-sub{font-size:14px;color:var(--t2);margin-top:4px;line-height:20px;max-width:600px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--r8);
+     font-size:14px;font-weight:500;border:1px solid transparent;cursor:pointer;font-family:var(--font);
+     letter-spacing:var(--ls);white-space:nowrap;transition:all .12s}
+.btn-ghost{background:var(--white);color:var(--t2);border-color:var(--border)}
+.btn-ghost:hover{background:var(--bg-page);color:var(--t1)}
+.btn-primary{background:var(--blue-500);color:var(--white);border-color:var(--blue-500);box-shadow:var(--sh-xs)}
+.btn-primary:hover{background:#2565be}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+
+/* Content area */
+.content{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+
+/* ── SELECTED PROGRAMS BAR ── */
+.selected-bar{background:var(--white);border:1px solid var(--border);border-radius:var(--r8);
+              padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.selected-bar-label{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap}
+.selected-bar-sub{font-size:12px;color:var(--t3);white-space:nowrap}
+.selected-chips{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:1}
+.prog-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+           background:var(--blue-50);border:1px solid var(--blue-100);border-radius:var(--r99);
+           font-size:12px;font-weight:500;color:var(--blue-500)}
+.prog-chip .chip-level{font-weight:400;color:var(--info-400);margin-left:2px}
+.prog-chip-remove{width:14px;height:14px;display:flex;align-items:center;justify-content:center;
+                  cursor:pointer;border-radius:50%;color:var(--blue-400);margin-left:2px;opacity:.7}
+.prog-chip-remove:hover{opacity:1;background:var(--blue-100)}
+.prog-chip-remove svg{width:10px;height:10px}
+.selected-empty{font-size:13px;color:var(--t3);font-style:italic}
+
+/* Auto-create note */
+.auto-note{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+           background:var(--ok-50);border:1px solid rgba(23,128,60,.2);border-radius:var(--r99);
+           font-size:12px;color:var(--ok-400);font-weight:500;white-space:nowrap;flex-shrink:0}
+.auto-note svg{width:12px;height:12px}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:10px}
+.search-wrap{display:flex;align-items:center;gap:8px;background:var(--white);
+             border:1px solid var(--border);border-radius:var(--r8);padding:7px 12px;flex:1;max-width:380px}
+.search-wrap svg{width:15px;height:15px;color:var(--t3);flex-shrink:0}
+.search-wrap input{flex:1;border:none;outline:none;font-family:var(--font);font-size:14px;
+                   color:var(--t1);background:transparent;letter-spacing:var(--ls)}
+.search-wrap input::placeholder{color:var(--t3)}
+.filter-chips{display:flex;align-items:center;gap:6px}
+.fchip{padding:5px 12px;border-radius:var(--r99);font-size:12px;font-weight:500;cursor:pointer;
+       border:1px solid var(--border);background:var(--white);color:var(--t2);transition:all .12s}
+.fchip:hover{background:var(--bg-page)}
+.fchip.active{background:var(--blue-50);border-color:var(--blue-100);color:var(--blue-500)}
+.toolbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.result-count{font-size:13px;color:var(--t3)}
+
+/* ── TABLE ── */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--r12);
+            overflow:hidden;box-shadow:var(--sh-card)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg-nav)}
+th{padding:10px 14px;font-size:12px;font-weight:600;color:var(--t2);text-align:left;
+   white-space:nowrap;border-bottom:1px solid var(--border);letter-spacing:.02em;text-transform:uppercase}
+th.sort{cursor:pointer;user-select:none}
+th.sort:hover{color:var(--t1)}
+th .sort-icon{display:inline-flex;align-items:center;gap:3px;margin-left:4px;opacity:.5}
+th.sort:hover .sort-icon{opacity:1}
+td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafbfc}
+.cb-cell{width:36px;padding-left:16px}
+.cb{width:15px;height:15px;border:1.5px solid var(--border);border-radius:var(--r4);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--white)}
+.cb.checked{background:var(--blue-500);border-color:var(--blue-500)}
+.cb.checked svg{display:block}
+.cb svg{display:none;width:9px;height:9px;color:#fff}
+
+.prog-name{font-size:14px;font-weight:500;color:var(--t1);line-height:20px}
+.prog-org{font-size:12px;color:var(--t3);margin-top:1px}
+
+/* Level chip */
+.level-chip{display:inline-flex;align-items:center;padding:2px 8px;border-radius:var(--r99);
+            font-size:11px;font-weight:500;white-space:nowrap}
+.lc-res{background:#f0f4ff;color:#3b4fd8;border:1px solid rgba(59,79,216,.15)}
+.lc-iop{background:var(--pur-50);color:var(--pur-400);border:1px solid rgba(110,46,239,.15)}
+.lc-op{background:var(--warn-50);color:var(--warn-400);border:1px solid rgba(188,112,0,.15)}
+.lc-php{background:var(--ok-50);color:var(--ok-400);border:1px solid rgba(23,128,60,.15)}
+.lc-det{background:#fff0f0;color:#c53030;border:1px solid rgba(197,48,48,.15)}
+
+/* Accreditation badges */
+.accred-list{display:flex;gap:4px;flex-wrap:wrap}
+.accred{padding:2px 7px;border-radius:var(--r99);font-size:11px;font-weight:500;
+        background:var(--bg-page);border:1px solid var(--border);color:var(--t2)}
+
+/* Capacity bar */
+.cap-row{display:flex;align-items:center;gap:8px}
+.cap-bar{flex:1;max-width:80px;height:4px;background:var(--border);border-radius:var(--r99);overflow:hidden}
+.cap-fill{height:100%;border-radius:var(--r99);background:var(--ok-400)}
+.cap-fill.med{background:var(--warn-400)}
+.cap-fill.low{background:var(--err-400)}
+.cap-text{font-size:12px;color:var(--t3)}
+
+/* State tag */
+.state-tag{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--t2)}
+.state-tag svg{width:13px;height:13px;color:var(--t3)}
+
+/* Actions */
+.action-cell{width:130px;text-align:right;padding-right:16px}
+.add-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r6);
+         font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--blue-100);
+         background:var(--blue-50);color:var(--blue-500);transition:all .15s;font-family:var(--font)}
+.add-btn:hover{background:var(--blue-500);color:#fff;border-color:var(--blue-500)}
+.add-btn svg{width:12px;height:12px}
+.added-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r6);
+           font-size:13px;font-weight:500;cursor:pointer;border:1px solid rgba(23,128,60,.2);
+           background:var(--ok-50);color:var(--ok-400);font-family:var(--font);transition:all .15s}
+.added-btn:hover{background:#fee;border-color:#fca5a5;color:var(--err-400)}
+.added-btn svg{width:12px;height:12px}
+.added-btn .add-icon{display:none}
+.added-btn .rm-icon{display:block}
+
+/* Pagination */
+.pagination{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;
+            border-top:1px solid var(--border);background:var(--white)}
+.page-info{font-size:13px;color:var(--t3)}
+.page-btns{display:flex;align-items:center;gap:4px}
+.page-btn{width:30px;height:30px;border-radius:var(--r6);display:flex;align-items:center;
+          justify-content:center;cursor:pointer;font-size:13px;font-weight:500;
+          border:1px solid var(--border);background:var(--white);color:var(--t2)}
+.page-btn:hover{background:var(--bg-page)}
+.page-btn.active{background:var(--blue-50);border-color:var(--blue-100);color:var(--blue-500)}
+.page-btn svg{width:14px;height:14px}
+
+/* ── FOOTER ── */
+.footer{background:var(--white);border-top:1.5px solid var(--border);
+        display:flex;align-items:center;justify-content:space-between;padding:16px 24px}
+.footer .btn{padding:10px 20px;font-size:15px}
+
+/* Highlight row when added */
+tr.selected-row td{background:#f7fbff !important}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- ── LEFT NAV ── -->
+  <nav class="nav">
+    <!-- Logo -->
+    <div class="nav-logo">
+      <div style="display:flex;align-items:center;gap:8px">
+        <svg class="nav-gem" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="8" fill="#2e77d7"/>
+          <path d="M16 6L24 12V20L16 26L8 20V12L16 6Z" fill="white" fill-opacity="0.3"/>
+          <path d="M16 6L24 12H8L16 6Z" fill="white" fill-opacity="0.7"/>
+          <path d="M8 12L16 26L8 20V12Z" fill="white" fill-opacity="0.4"/>
+          <path d="M24 12L16 26L24 20V12Z" fill="white" fill-opacity="0.55"/>
+        </svg>
+        <span class="nav-wordmark">Laptis</span>
+      </div>
+      <div class="nav-collapse">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      </div>
+    </div>
+    <div class="nav-divider"></div>
+
+    <!-- Stepper -->
+    <div class="stepper">
+
+      <!-- Step 1: Basic Details — done -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot done">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="step-line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label done">1. Basic Details</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Users — done -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot done">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="step-line done"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label done">2. Users</div>
+        </div>
+      </div>
+
+      <!-- Step 3: Program Selection — ACTIVE (new step) -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot active"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label active">3. Program Selection</div>
+        </div>
+      </div>
+
+      <!-- Step 4: Tab Configuration -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">4. Tab Configuration</div>
+        </div>
+      </div>
+
+      <!-- Step 5: Tab Properties -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">5. Tab Properties</div>
+        </div>
+      </div>
+
+      <!-- Step 6: Workflows + sub-items -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">6. Workflows</div>
+          <div class="step-sub">
+            <div class="step-sub-item">6.1. Referral Status</div>
+            <div class="step-sub-item">6.2. Email Notification</div>
+            <div class="step-sub-item">6.3. Slack Notification</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7: Tab Summary -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">7. Tab Summary</div>
+        </div>
+      </div>
+
+      <!-- Step 8: Question Configuration -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">8. Question Configuration</div>
+          <div class="step-sub">
+            <div class="step-sub-item">8.1. Baseline Questions</div>
+            <div class="step-sub-item">8.2. Full Questions</div>
+            <div class="step-sub-item">8.3. Custom Questions</div>
+            <div class="step-sub-item">8.4. Priority Questions</div>
+            <div class="step-sub-item">8.5. Re-Order</div>
+            <div class="step-sub-item">8.6. Program Branching</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 9: Question Preview -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">9. Question Preview</div>
+        </div>
+      </div>
+
+      <!-- Step 10: Submit -->
+      <div class="step-row">
+        <div class="step-spine">
+          <div class="step-dot"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-label">10. Submit</div>
+        </div>
+      </div>
+
+    </div><!-- /stepper -->
+
+    <!-- Bottom -->
+    <div class="nav-bottom">
+      <div class="nav-divider"></div>
+      <div class="nav-help">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Need Help?
+      </div>
+      <div class="nav-profile">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="nav-avatar">DT</div>
+          <div>
+            <div class="nav-name">Dylan T.</div>
+            <div class="nav-role">Admin</div>
+          </div>
+        </div>
+        <svg width="16" height="16" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+    </div>
+  </nav><!-- /nav -->
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+
+    <!-- Page header -->
+    <div class="page-hdr">
+      <div class="back-btn">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <span class="page-title">New Clinic Onboarding</span>
+    </div>
+
+    <!-- Section header -->
+    <div class="section-hdr">
+      <div>
+        <div class="section-title">3. Program Selection</div>
+        <div class="section-sub">Search and add the programs that will be available under this clinic. A tab will be auto-created for each program you add.</div>
+      </div>
+      <button class="btn btn-ghost" style="flex-shrink:0">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Show Preview
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Selected programs bar -->
+      <div class="selected-bar" id="selected-bar">
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span class="selected-bar-label">Selected Programs</span>
+          <span class="selected-bar-sub" id="selected-count">(0 of 800+ added)</span>
+        </div>
+        <div class="selected-chips" id="selected-chips">
+          <span class="selected-empty" id="empty-hint">No programs added yet — search and add below.</span>
+        </div>
+        <div class="auto-note">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Tabs auto-created on Next
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Search programs by name, location, or license…" id="search-input" oninput="filterTable()">
+        </div>
+        <div class="filter-chips">
+          <div class="fchip active" onclick="setFilter('all',this)">All Levels</div>
+          <div class="fchip" onclick="setFilter('res',this)">Residential</div>
+          <div class="fchip" onclick="setFilter('iop',this)">IOP</div>
+          <div class="fchip" onclick="setFilter('php',this)">PHP</div>
+          <div class="fchip" onclick="setFilter('op',this)">Outpatient</div>
+          <div class="fchip" onclick="setFilter('det',this)">Detox</div>
+        </div>
+        <div class="toolbar-right">
+          <span class="result-count" id="result-count">Showing 10 of 847 programs</span>
+          <button class="btn btn-ghost">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+            Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <table id="prog-table">
+          <thead>
+            <tr>
+              <th class="cb-cell"></th>
+              <th class="sort">Program Name <span class="sort-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="11" height="11"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th>Level of Care</th>
+              <th>Accreditation</th>
+              <th class="sort">Location <span class="sort-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="11" height="11"><polyline points="6 9 12 15 18 9"/></svg></span></th>
+              <th>Capacity</th>
+              <th class="action-cell"></th>
+            </tr>
+          </thead>
+          <tbody id="prog-tbody">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <span class="page-info" id="page-info">Page 1 of 85</span>
+          <div class="page-btns">
+            <div class="page-btn" onclick="prevPage()">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </div>
+            <div class="page-btn active">1</div>
+            <div class="page-btn">2</div>
+            <div class="page-btn">3</div>
+            <div class="page-btn" style="border:none;color:var(--t3)">…</div>
+            <div class="page-btn">85</div>
+            <div class="page-btn" onclick="nextPage()">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <!-- Footer -->
+    <div class="footer">
+      <button class="btn btn-ghost">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="15" height="15"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="footer-count" style="font-size:13px;color:var(--t3)">0 programs selected</span>
+        <button class="btn btn-primary" id="next-btn" onclick="goNext()">
+          Next
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="15" height="15"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /shell -->
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const PROGRAMS = [
+  { id:1, name:'New Horizons Recovery Institute', org:'New Horizons Health Group', level:'res', loc:'Atlanta, GA', accred:['CARF','JCAHO'], cap:18, total:24 },
+  { id:2, name:'Cedar Ridge Recovery Center', org:'Cedar Ridge Health Systems', level:'res', loc:'Nashville, TN', accred:['JCAHO'], cap:9, total:20 },
+  { id:3, name:'Lakeside Treatment Center', org:'Lakeside Behavioral Health', level:'iop', loc:'Austin, TX', accred:['CARF','SAMHSA'], cap:22, total:30 },
+  { id:4, name:'Evergreen Wellness & Recovery', org:'Evergreen Care Partners', level:'php', loc:'Portland, OR', accred:['CARF'], cap:14, total:16 },
+  { id:5, name:'Summit Detox & Stabilization', org:'Summit Health Network', level:'det', loc:'Denver, CO', accred:['JCAHO','CARF'], cap:6, total:12 },
+  { id:6, name:'Coastal Pathways Outpatient', org:'Coastal Behavioral Services', level:'op', loc:'San Diego, CA', accred:['SAMHSA'], cap:35, total:40 },
+  { id:7, name:'Brightstone Residential Program', org:'Brightstone Health', level:'res', loc:'Phoenix, AZ', accred:['CARF','JCAHO'], cap:10, total:18 },
+  { id:8, name:'Riverwatch IOP & PHP', org:'Riverwatch Behavioral Health', level:'iop', loc:'Charlotte, NC', accred:['CARF'], cap:28, total:35 },
+  { id:9, name:'Highlands Detox Center', org:'Highlands Medical Group', level:'det', loc:'Salt Lake City, UT', accred:['JCAHO'], cap:4, total:10 },
+  { id:10, name:'Pacific Grove Outpatient', org:'Pacific Grove Recovery', level:'op', loc:'Seattle, WA', accred:['CARF','SAMHSA'], cap:42, total:50 },
+];
+
+const LEVEL_LABELS = { res:'Residential (3.1)', iop:'IOP (2.1)', php:'PHP (2.5)', op:'Outpatient (1.0)', det:'Detox (3.7)' };
+const LEVEL_CSS    = { res:'lc-res', iop:'lc-iop', php:'lc-php', op:'lc-op', det:'lc-det' };
+
+let selected = new Set();
+let currentFilter = 'all';
+
+// ── RENDER ─────────────────────────────────────────────────────
+function renderTable(programs) {
+  const tbody = document.getElementById('prog-tbody');
+  tbody.innerHTML = programs.map(p => {
+    const isAdded = selected.has(p.id);
+    const capPct  = Math.round((p.cap / p.total) * 100);
+    const barCls  = capPct >= 70 ? '' : capPct >= 40 ? 'med' : 'low';
+    const rowCls  = isAdded ? 'selected-row' : '';
+    return `
+    <tr class="${rowCls}" id="row-${p.id}">
+      <td class="cb-cell">
+        <div class="cb ${isAdded ? 'checked' : ''}" onclick="toggleProg(${p.id})" id="cb-${p.id}">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </td>
+      <td>
+        <div class="prog-name">${p.name}</div>
+        <div class="prog-org">${p.org}</div>
+      </td>
+      <td><span class="level-chip ${LEVEL_CSS[p.level]}">${LEVEL_LABELS[p.level]}</span></td>
+      <td>
+        <div class="accred-list">
+          ${p.accred.map(a => `<span class="accred">${a}</span>`).join('')}
+        </div>
+      </td>
+      <td>
+        <div class="state-tag">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${p.loc}
+        </div>
+      </td>
+      <td>
+        <div class="cap-row">
+          <div class="cap-bar"><div class="cap-fill ${barCls}" style="width:${capPct}%"></div></div>
+          <span class="cap-text">${p.cap}/${p.total} beds</span>
+        </div>
+      </td>
+      <td class="action-cell">
+        ${isAdded
+          ? `<button class="added-btn" onclick="toggleProg(${p.id})">
+              <svg class="rm-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              Added
+            </button>`
+          : `<button class="add-btn" onclick="toggleProg(${p.id})">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add to Clinic
+            </button>`
+        }
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderSelectedBar() {
+  const chips    = document.getElementById('selected-chips');
+  const count    = document.getElementById('selected-count');
+  const empty    = document.getElementById('empty-hint');
+  const footerC  = document.getElementById('footer-count');
+  const n        = selected.size;
+
+  count.textContent = `(${n} of 847 added)`;
+  footerC.textContent = n === 0 ? 'No programs selected' : `${n} program${n===1?'':'s'} selected`;
+
+  if (n === 0) {
+    chips.innerHTML = `<span class="selected-empty" id="empty-hint">No programs added yet — search and add below.</span>`;
+    return;
+  }
+
+  chips.innerHTML = [...selected].map(id => {
+    const p = PROGRAMS.find(x => x.id === id);
+    if (!p) return '';
+    return `
+      <div class="prog-chip" id="chip-${id}">
+        ${p.name}
+        <span class="chip-level">${LEVEL_LABELS[p.level]}</span>
+        <div class="prog-chip-remove" onclick="toggleProg(${id})">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ── TOGGLE ────────────────────────────────────────────────────
+function toggleProg(id) {
+  if (selected.has(id)) selected.delete(id);
+  else selected.add(id);
+  renderSelectedBar();
+  const filtered = getFiltered();
+  renderTable(filtered);
+}
+
+// ── FILTER ────────────────────────────────────────────────────
+function getFiltered() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  return PROGRAMS.filter(p => {
+    const matchLevel = currentFilter === 'all' || p.level === currentFilter;
+    const matchQ     = !q || p.name.toLowerCase().includes(q) || p.org.toLowerCase().includes(q) || p.loc.toLowerCase().includes(q);
+    return matchLevel && matchQ;
+  });
+}
+
+function filterTable() {
+  const filtered = getFiltered();
+  document.getElementById('result-count').textContent =
+    `Showing ${filtered.length} of 847 programs`;
+  renderTable(filtered);
+}
+
+function setFilter(val, el) {
+  currentFilter = val;
+  document.querySelectorAll('.fchip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterTable();
+}
+
+function prevPage() {}
+function nextPage() {}
+function goNext() {
+  if (selected.size === 0) {
+    alert('Please add at least one program before continuing.');
+    return;
+  }
+  alert(`Proceeding with ${selected.size} program(s) selected.\n\nTabs will be auto-created for each.`);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderTable(PROGRAMS);
+renderSelectedBar();
+</script>
+</body>
+</html>

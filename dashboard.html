@@ -1,0 +1,1366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laptis — Dashboard · Manage Cases</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS (Figma Sending Side) ── */
+:root {
+  --font: 'Inter', sans-serif;
+  --ls: -0.2px;
+  /* Text */
+  --t1: #1b1d20; --t2: #4e535a; --t3: #6b7280; --t-dis: #8e95a3; --t-white: #ffffff;
+  /* Backgrounds */
+  --bg-page: #f8f9fa; --bg-nav: #f3f4f6; --bg-hdr: #eef0f3;
+  --bg-alt: #f8f9fa; --bg-row-hover: #f5f6f8; --white: #ffffff;
+  /* Borders */
+  --border: #d7dbe0; --border-lt: rgba(215,219,224,0.5);
+  /* Primary */
+  --blue-50: #e8f1fb; --blue-400: #5293e5; --blue-500: #2e77d7;
+  /* Secondary */
+  --sec-500: #496a96; --sec-700: #2c425f;
+  /* Info */
+  --info-50: #e3f0ff; --info-200: #7bbdf9; --info-400: #1670bc;
+  /* Warning */
+  --warn-50: #fff4d9; --warn-200: #ffcb66; --warn-400: #bc7000;
+  /* Success / Accepted */
+  --ok-50: #f0fdf4; --ok-200: #a7f3d0; --ok-300: #71d293; --ok-400: #17803c;
+  /* Error */
+  --err-400: #991818;
+  /* Neutral */
+  --n-0: #ffffff; --n-300: #cbcfd6;
+  /* Radius */
+  --r12: 12px; --r8: 8px; --r6: 6px; --r4: 4px; --r99: 9999px;
+  /* Shadows */
+  --sh-xs: 0 1px 0.5px rgba(29,41,61,0.02);
+  --sh-dropdown: 0px 10px 15px rgba(0,0,0,0.1), 0px 4px 6px rgba(0,0,0,0.05);
+  --sh-modal: 0px 20px 40px rgba(0,0,0,0.15), 0px 8px 16px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); font-size: 14px; line-height: 20px; letter-spacing: var(--ls);
+       background: var(--bg-page); color: var(--t1); -webkit-font-smoothing: antialiased; }
+
+/* ── LAYOUT ── */
+.shell { display: flex; min-height: 100vh; }
+
+/* ── LEFT NAV ── */
+.nav { width: 250px; flex-shrink: 0; background: var(--bg-nav); border-right: 1px solid var(--border);
+       display: flex; flex-direction: column; gap: 20px; padding: 20px; }
+.nav-logo { display: flex; align-items: center; justify-content: space-between; }
+.nav-logomark { display: flex; align-items: center; gap: 6px; }
+.nav-gem { width: 32px; height: 32px; }
+.nav-wordmark { font-size: 17px; font-weight: 700; color: var(--blue-500); letter-spacing: -.4px; }
+.nav-collapse { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+                cursor: pointer; border-radius: var(--r4); color: var(--t3); }
+.nav-collapse:hover { background: var(--border); }
+.nav-divider { height: 1px; background: var(--border); }
+.nav-group { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.nav-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: var(--r8);
+            font-size: 14px; color: var(--t2); cursor: pointer; text-decoration: none; transition: background .12s; }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-item:hover { background: rgba(0,0,0,.04); }
+.nav-item.parent { background: var(--white); }
+.nav-item.parent span { color: var(--blue-500); font-weight: 500; }
+.nav-sub { display: flex; flex-direction: column; gap: 4px; padding-left: 0; }
+.nav-sub-item { display: flex; align-items: center; gap: 6px; padding: 6px 8px 6px 28px;
+                border-radius: var(--r8); font-size: 14px; color: var(--t2); cursor: pointer; transition: background .12s; }
+.nav-sub-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-sub-item:hover { background: rgba(0,0,0,.04); }
+.nav-sub-item.active { background: var(--blue-50); }
+.nav-sub-item.active span { color: var(--blue-500); font-weight: 500; }
+.nav-bottom { display: flex; flex-direction: column; gap: 16px; }
+.nav-help { display: flex; align-items: center; gap: 8px; padding: 12px; font-size: 14px; color: var(--t2); cursor: pointer; border-radius: var(--r4); }
+.nav-help:hover { background: rgba(0,0,0,.04); }
+.nav-help svg { width: 16px; height: 16px; }
+.nav-profile { display: flex; align-items: center; justify-content: space-between; }
+.nav-avatar { width: 40px; height: 40px; border-radius: 50%; background: #f0b10d;
+              display: flex; align-items: center; justify-content: center;
+              font-size: 14px; font-weight: 600; color: var(--t1); flex-shrink: 0; }
+.nav-name { font-size: 14px; font-weight: 500; color: var(--t1); }
+.nav-role { font-size: 12px; color: var(--t2); }
+.nav-arrow { width: 16px; height: 16px; color: var(--t3); }
+
+/* ── MAIN ── */
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; padding-right: 12px; }
+
+/* ── PAGE HEADER ── */
+.page-hdr { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 0 0; }
+.page-title { font-size: 20px; font-weight: 600; color: var(--t1); line-height: 36px; }
+.notif-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--white);
+             border: 1px solid var(--blue-500); display: flex; align-items: center; justify-content: center;
+             cursor: pointer; position: relative; }
+.notif-btn svg { width: 20px; height: 20px; color: var(--blue-500); }
+.notif-badge { position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; border-radius: 50%;
+               background: var(--err-400); display: flex; align-items: center; justify-content: center;
+               font-size: 10px; font-weight: 500; color: #fff; border: 2px solid var(--white); }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 8px; border-bottom: 1px solid var(--border); margin-top: 0; padding-top: 8px; }
+.tab-item { display: flex; align-items: center; gap: 6px; padding: 0 8px 12px;
+            font-size: 14px; font-weight: 400; color: var(--t2); cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .12s; }
+.tab-item svg { width: 16px; height: 16px; }
+.tab-item.active { color: var(--blue-500); font-weight: 500; border-bottom-color: var(--blue-500); }
+.tab-item:hover:not(.active) { color: var(--t1); }
+
+/* ── TOOLBAR ── */
+.toolbar { display: flex; align-items: center; gap: 24px; padding: 20px 0; }
+.search-wrap { flex: 1; display: flex; align-items: center; border: 1px solid var(--n-300);
+               border-radius: var(--r8); background: var(--white); height: 40px; overflow: hidden; }
+.search-icon { padding: 0 8px; display: flex; align-items: center; }
+.search-icon svg { width: 16px; height: 16px; color: var(--t3); }
+.search-input { flex: 1; border: none; outline: none; font-family: var(--font); font-size: 12px; color: var(--t3);
+                background: transparent; letter-spacing: var(--ls); }
+.search-btn { height: 100%; padding: 0 12px; font-size: 12px; font-weight: 500; color: var(--t1);
+              background: #f5f6f8; border: none; border-left: 1px solid var(--n-300); cursor: pointer; font-family: var(--font); }
+.search-btn:hover { background: var(--bg-hdr); }
+.toolbar-btns { display: flex; align-items: center; gap: 12px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r8);
+       font-family: var(--font); font-size: 14px; font-weight: 500; letter-spacing: var(--ls);
+       border: 1px solid transparent; padding: 10px 16px; line-height: 20px; cursor: pointer; transition: all .12s; }
+.btn svg { width: 16px; height: 16px; }
+.btn-ghost { background: var(--white); color: var(--t1); border-color: var(--n-300); }
+.btn-ghost:hover { background: var(--bg-page); }
+.btn-primary { background: var(--blue-500); color: var(--white); border-color: var(--blue-500); box-shadow: var(--sh-xs); }
+.btn-primary:hover { background: #2565be; }
+.btn-success { background: var(--ok-400); color: var(--white); border-color: var(--ok-400); box-shadow: var(--sh-xs); }
+.btn-success:hover { background: #126832; }
+.divider-v { width: 1px; height: 24px; background: var(--border); }
+
+/* ── TABLE ── */
+.tbl-wrap { background: var(--white); border: 1px solid var(--border); border-radius: var(--r12); overflow: hidden; }
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl thead th { background: var(--bg-hdr); border-bottom: 1.5px solid var(--border); padding: 0 16px;
+                height: 44px; text-align: left; font-size: 12px; font-weight: 600; color: var(--t2); white-space: nowrap; }
+.tbl thead th:first-child { width: 48px; padding: 0 8px; border-right: 0.5px solid var(--border); }
+.tbl thead th:last-child { width: 76px; text-align: center; border-left: 1.5px solid var(--border); background: var(--white); }
+.th-inner { display: flex; align-items: center; gap: 6px; }
+.th-sort { width: 12px; height: 12px; color: var(--t3); cursor: pointer; flex-shrink: 0; }
+.tbl tbody tr { border-bottom: 0.5px solid var(--border); }
+.tbl tbody tr:nth-child(even) { background: var(--bg-alt); }
+.tbl tbody tr:hover { background: #f0f4fb; }
+.tbl tbody td { padding: 0 16px; height: 64px; font-size: 14px; color: var(--t1); white-space: nowrap; vertical-align: middle; }
+.tbl tbody td:first-child { width: 48px; padding: 0 8px; text-align: center; color: var(--t-dis); font-size: 12px; font-weight: 500; border-right: 0.5px solid var(--border); }
+.tbl tbody td.actions-cell { width: 76px; text-align: center; border-left: 1.5px solid var(--border); background: #f5f6f8; }
+.case-id { display: inline-flex; align-items: center; gap: 6px; color: var(--blue-500); font-weight: 500; cursor: pointer; }
+.case-id svg { width: 16px; height: 16px; }
+.case-id:hover { text-decoration: underline; }
+.more-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: auto; border-radius: var(--r4); }
+.more-btn:hover { background: var(--border); }
+.more-btn svg { width: 24px; height: 24px; color: var(--t2); }
+.tbl-footer { display: flex; align-items: center; justify-content: space-between; background: var(--bg-hdr);
+              border-top: 1px solid var(--border); padding: 8px 16px; }
+.tbl-footer-text { font-size: 12px; font-weight: 600; color: var(--sec-500); }
+.tbl-footer-link { font-size: 12px; font-weight: 600; color: var(--sec-500); }
+.tbl-footer-link a { color: inherit; }
+
+/* ── STATUS COLUMN (dropdown button) ── */
+.status-cell { position: relative; }
+.ref-btn-wrap { display: inline-flex; align-items: center; position: relative; }
+.ref-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px;
+           background: var(--bg-hdr); border: 1px solid var(--n-300); border-radius: var(--r8);
+           font-size: 14px; font-weight: 500; color: var(--t1); cursor: pointer; transition: all .12s;
+           font-family: var(--font); letter-spacing: var(--ls); white-space: nowrap; }
+.ref-btn:hover { background: var(--bg-row-hover); }
+.ref-btn.open { background: #e7e9eb; }
+.ref-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+.ref-btn-dot { position: absolute; top: -5px; right: -5px; width: 10px; height: 10px;
+               border-radius: 50%; background: var(--err-400); border: 2px solid var(--white); }
+.closed-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px;
+              background: var(--bg-hdr); border: 1px solid var(--n-300); border-radius: var(--r8);
+              font-size: 14px; font-weight: 500; color: var(--t2); font-family: var(--font); letter-spacing: var(--ls); }
+.closed-btn svg { width: 16px; height: 16px; }
+
+/* ── REFERRAL DROPDOWN PANEL ── */
+.ref-dropdown { position: absolute; top: calc(100% + 6px); left: 0; z-index: 100; min-width: 560px;
+                background: var(--white); border: 1px solid var(--border); border-radius: var(--r8);
+                box-shadow: var(--sh-dropdown); display: none; }
+.ref-dropdown.open { display: block; }
+.ref-dropdown-body { display: flex; }
+.rd-col-prog { flex: 1; min-width: 0; }
+.rd-col-level { width: 160px; flex-shrink: 0; }
+.rd-col-status { width: 170px; flex-shrink: 0; }
+.rd-row { display: flex; align-items: center; height: 48px; border-bottom: 0.5px solid var(--border-lt); }
+.rd-row:last-child { border-bottom: none; }
+.rd-row:nth-child(even) { background: #f5f6f8; }
+.rd-cell { padding: 8px 16px; font-size: 14px; color: var(--t2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rd-cell.bold { font-weight: 500; color: var(--t1); }
+
+/* Level badge */
+.lvl-badge { display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px;
+             background: var(--info-50); border: 1px solid var(--info-200); border-radius: var(--r99);
+             font-size: 12px; font-weight: 500; color: var(--sec-700); white-space: nowrap; }
+
+/* Status badges */
+.status-badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px;
+                border-radius: 16px; font-size: 12px; font-weight: 500; border: 1px solid; white-space: nowrap; }
+.status-badge svg { width: 10px; height: 10px; flex-shrink: 0; }
+.sb-action  { background: var(--warn-50);  border-color: var(--warn-200);  color: var(--warn-400); }
+.sb-ready   { background: var(--warn-50);  border-color: var(--warn-200);  color: var(--warn-400); }
+.sb-update  { background: var(--info-50);  border-color: var(--info-200);  color: var(--info-400); }
+.sb-wait    { background: var(--info-50);  border-color: var(--info-200);  color: var(--info-400); }
+.sb-accepted{ background: var(--ok-50);    border-color: var(--ok-300);    color: var(--ok-400); }
+.sb-declined{ background: #fff1f2;         border-color: #fecdd3;          color: #be123c; }
+.sb-pending { background: #f5f6f8;         border-color: var(--n-300);     color: var(--t2); }
+
+/* Dropdown footer */
+.rd-footer { border-top: 1px solid var(--border); padding: 12px 16px; display: flex; gap: 12px; align-items: center; }
+.rd-footer-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+                 padding: 8px 12px; border-radius: var(--r8); font-size: 14px; font-weight: 500;
+                 font-family: var(--font); letter-spacing: var(--ls); cursor: pointer; transition: all .12s; border: 1px solid var(--n-300); }
+.rd-footer-btn svg { width: 16px; height: 16px; }
+.rd-btn-submit { background: var(--white); color: var(--t1); }
+.rd-btn-submit:hover { background: var(--bg-page); }
+.rd-btn-manage { background: var(--blue-500); color: var(--white); border-color: var(--blue-500); box-shadow: var(--sh-xs); }
+.rd-btn-manage:hover { background: #2565be; }
+.rd-btn-confirm { background: var(--ok-400); color: var(--white); border-color: var(--ok-400); box-shadow: var(--sh-xs); }
+.rd-btn-confirm:hover { background: #126832; }
+
+/* Accepted label in dropdown header */
+.accepted-notice { display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+                   background: var(--ok-50); border-bottom: 1px solid var(--ok-200);
+                   font-size: 12px; font-weight: 500; color: var(--ok-400); }
+.accepted-notice svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+/* ══════════════════════════════
+   CONFIRM ACCEPTANCE MODAL
+══════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; background: rgba(29,41,61,0.45); z-index: 1000;
+                 display: flex; align-items: center; justify-content: center;
+                 opacity: 0; transition: opacity .2s; pointer-events: none; }
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+.modal { background: var(--white); border-radius: var(--r12); box-shadow: var(--sh-modal);
+         width: 480px; max-width: calc(100vw - 40px);
+         transform: translateY(8px); transition: transform .2s;
+         display: flex; flex-direction: column; overflow: hidden; }
+.modal-overlay.open .modal { transform: translateY(0); }
+
+/* Modal header */
+.modal-hdr { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.modal-hdr-left { display: flex; align-items: flex-start; gap: 12px; }
+.modal-icon { width: 40px; height: 40px; border-radius: var(--r8); background: var(--ok-50); border: 1px solid var(--ok-200);
+              display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.modal-icon svg { width: 20px; height: 20px; color: var(--ok-400); }
+.modal-title { font-size: 16px; font-weight: 600; color: var(--t1); margin-bottom: 2px; }
+.modal-subtitle { font-size: 13px; color: var(--t2); line-height: 18px; }
+.modal-close { width: 32px; height: 32px; border-radius: var(--r6); border: 1px solid var(--border);
+               display: flex; align-items: center; justify-content: center; cursor: pointer;
+               color: var(--t3); flex-shrink: 0; background: var(--white); transition: all .12s; }
+.modal-close:hover { background: var(--bg-page); color: var(--t1); }
+.modal-close svg { width: 14px; height: 14px; }
+
+/* Modal body */
+.modal-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+.field-label { font-size: 12px; font-weight: 500; color: var(--t2); margin-bottom: 6px; }
+.field-label span { color: var(--err-400); margin-left: 2px; }
+
+/* Custom select */
+.custom-select { position: relative; }
+.select-btn { display: flex; align-items: center; justify-content: space-between; gap: 8px;
+              padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--r8);
+              background: var(--white); font-family: var(--font); font-size: 14px; color: var(--t1);
+              letter-spacing: var(--ls); cursor: pointer; transition: border-color .12s; }
+.select-btn:hover, .select-btn.open { border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+.select-btn svg { width: 16px; height: 16px; color: var(--t3); flex-shrink: 0; transition: transform .15s; }
+.select-btn.open svg { transform: rotate(180deg); }
+.select-value { display: flex; align-items: center; gap: 8px; min-width: 0; overflow: hidden; }
+.select-placeholder { color: var(--t3); }
+.select-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px;
+                background: var(--ok-50); border: 1px solid var(--ok-200); border-radius: var(--r99);
+                font-size: 11px; font-weight: 500; color: var(--ok-400); flex-shrink: 0; }
+.select-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 10;
+                   background: var(--white); border: 1px solid var(--border); border-radius: var(--r8);
+                   box-shadow: var(--sh-dropdown); display: none; overflow: hidden; }
+.select-dropdown.open { display: block; }
+.select-option { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
+                 font-size: 14px; color: var(--t1); cursor: pointer; gap: 10px; transition: background .1s; }
+.select-option:hover { background: var(--blue-50); }
+.select-option.selected { background: var(--blue-50); }
+.opt-left { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.opt-name { font-weight: 500; color: var(--t1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opt-level { font-size: 12px; color: var(--t3); }
+.opt-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px;
+             background: var(--ok-50); border: 1px solid var(--ok-200); border-radius: var(--r99);
+             font-size: 11px; font-weight: 500; color: var(--ok-400); flex-shrink: 0; }
+
+/* Textarea */
+.modal-textarea { width: 100%; border: 1px solid var(--border); border-radius: var(--r8);
+                  padding: 9px 12px; font-family: var(--font); font-size: 14px; color: var(--t1);
+                  letter-spacing: var(--ls); resize: vertical; min-height: 80px; outline: none;
+                  transition: border-color .12s; line-height: 20px; }
+.modal-textarea::placeholder { color: var(--t3); }
+.modal-textarea:focus { border-color: var(--blue-400); box-shadow: 0 0 0 3px var(--blue-50); }
+
+/* Info callout */
+.modal-callout { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
+                 background: var(--ok-50); border: 1px solid var(--ok-200); border-radius: var(--r6);
+                 font-size: 12px; color: var(--ok-400); line-height: 17px; }
+.modal-callout svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+/* Modal footer */
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border);
+                display: flex; justify-content: flex-end; gap: 10px; }
+.modal-footer .btn { padding: 9px 18px; font-size: 14px; }
+.btn-cancel { background: var(--white); color: var(--t2); border: 1px solid var(--border); }
+.btn-cancel:hover { background: var(--bg-page); color: var(--t1); }
+.btn-confirm-modal { background: var(--ok-400); color: var(--white); border-color: var(--ok-400); opacity: .5; pointer-events: none; }
+.btn-confirm-modal.enabled { opacity: 1; pointer-events: auto; }
+.btn-confirm-modal.enabled:hover { background: #126832; }
+
+/* ══ SUPPORT MODAL ══ */
+.support-overlay { position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:1000;
+                   display:flex;align-items:center;justify-content:center;padding:32px 20px;
+                   opacity:0;pointer-events:none;transition:opacity .2s; }
+.support-overlay.open { opacity:1;pointer-events:auto; }
+.support-modal { background:var(--bg-page);border:1px solid #adb3bc;border-radius:var(--r12);
+                 width:507px;max-width:calc(100vw - 40px);box-shadow:var(--sh-modal);
+                 overflow:hidden;transform:translateY(8px);transition:transform .22s; }
+.support-overlay.open .support-modal { transform:translateY(0); }
+.support-hdr { background:var(--bg-page);border-bottom:1px solid var(--border);
+               padding:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px; }
+.support-title { font-size:20px;font-weight:600;color:var(--t1);line-height:28px;letter-spacing:-.3px; }
+.support-sub { font-size:14px;color:var(--t2);line-height:22px;margin-top:4px; }
+.support-close { width:32px;height:32px;border-radius:var(--r6);border:1px solid var(--border);
+                 display:flex;align-items:center;justify-content:center;cursor:pointer;
+                 color:var(--t3);background:var(--white);transition:all .12s;flex-shrink:0; }
+.support-close:hover { background:var(--bg-page);color:var(--t1); }
+.support-close svg { width:14px;height:14px; }
+.support-grid { padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+.support-card { border:1px solid #adb3bc;border-radius:var(--r12);padding:24px 20px;
+                display:flex;flex-direction:column;align-items:center;gap:16px;
+                cursor:pointer;text-decoration:none;
+                background:var(--white);transition:border-color .15s,background .15s,box-shadow .15s; }
+.support-card:hover { border-color:var(--blue-400);background:var(--blue-50);
+                      box-shadow:0 2px 8px rgba(46,119,215,.1); }
+.support-card-icon { width:48px;height:48px;border-radius:50%;background:var(--blue-50);
+                     border:1px solid var(--blue-100);display:flex;align-items:center;
+                     justify-content:center;flex-shrink:0;transition:background .15s; }
+.support-card:hover .support-card-icon { background:var(--blue-100); }
+.support-card-icon svg { width:24px;height:24px;color:var(--blue-500); }
+.support-card-title { font-size:16px;font-weight:600;color:var(--t1);letter-spacing:-.2px;
+                      line-height:24px;text-align:center; }
+.support-card-desc { font-size:14px;font-weight:500;color:var(--t2);margin-top:3px;
+                     line-height:20px;text-align:center; }
+
+/* ══ VIEW UPLOADED DOCUMENTS MODAL ══ */
+.docs-overlay { position:fixed;inset:0;background:rgba(29,41,61,.45);z-index:1010;
+                display:flex;align-items:center;justify-content:center;padding:32px 20px;
+                opacity:0;pointer-events:none;transition:opacity .2s; }
+.docs-overlay.open { opacity:1;pointer-events:auto; }
+.docs-modal { background:var(--white);border:1px solid var(--border);border-radius:var(--r12);
+              width:600px;max-width:calc(100vw - 40px);max-height:calc(100vh - 80px);
+              box-shadow:var(--sh-modal);display:flex;flex-direction:column;
+              transform:translateY(8px);transition:transform .22s;overflow:hidden; }
+.docs-overlay.open .docs-modal { transform:translateY(0); }
+.docs-hdr { padding:20px;border-bottom:1px solid var(--border);
+            display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+            flex-shrink:0;background:var(--bg-page); }
+.docs-hdr-left { display:flex;flex-direction:column;gap:8px; }
+.docs-title { font-size:18px;font-weight:600;color:var(--t1);line-height:26px;letter-spacing:-.3px; }
+.docs-case-chip { display:inline-flex;align-items:center;gap:6px;padding:4px 10px;
+                  background:var(--info-50);border:1px solid var(--info-200);border-radius:var(--r99);
+                  font-size:12px;font-weight:500;color:var(--info-400);width:fit-content; }
+.docs-case-chip svg { width:12px;height:12px;flex-shrink:0; }
+.docs-close { width:32px;height:32px;border-radius:var(--r6);border:1px solid var(--border);
+              display:flex;align-items:center;justify-content:center;cursor:pointer;
+              color:var(--t3);background:var(--white);transition:all .12s;flex-shrink:0; }
+.docs-close:hover { background:var(--bg-page);color:var(--t1); }
+.docs-close svg { width:14px;height:14px; }
+.docs-body { overflow-y:auto;flex:1;padding:16px;display:flex;flex-direction:column;gap:8px; }
+.docs-count { font-size:12px;font-weight:500;color:var(--t3);padding:0 0 4px; }
+.doc-row { display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);
+           border-radius:var(--r8);background:var(--white);transition:background .12s; }
+.doc-row:hover { background:var(--bg-alt); }
+.doc-icon { width:40px;height:40px;border-radius:var(--r8);display:flex;align-items:center;
+            justify-content:center;flex-shrink:0; }
+.doc-icon.pdf { background:#fff1f1; }
+.doc-icon.pdf svg { color:#c0392b; }
+.doc-icon.img { background:#e8f5e9; }
+.doc-icon.img svg { color:#2e7d32; }
+.doc-icon.doc { background:var(--blue-50); }
+.doc-icon.doc svg { color:var(--blue-500); }
+.doc-icon svg { width:20px;height:20px; }
+.doc-info { flex:1;min-width:0; }
+.doc-name { font-size:14px;font-weight:500;color:var(--t1);letter-spacing:-.2px;
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.doc-meta { font-size:12px;color:var(--t3);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
+.doc-meta-dot { width:3px;height:3px;border-radius:50%;background:var(--n-300);flex-shrink:0; }
+.doc-type-pill { padding:2px 8px;border-radius:var(--r99);font-size:11px;font-weight:500;
+                 background:var(--bg-page);border:1px solid var(--border);color:var(--t3); }
+.doc-actions { display:flex;align-items:center;gap:6px;flex-shrink:0; }
+.doc-btn { display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:var(--r6);
+           font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;
+           border:1px solid var(--border);background:var(--white);color:var(--t2);
+           letter-spacing:var(--ls);transition:all .12s; }
+.doc-btn:hover { background:var(--bg-page);color:var(--t1); }
+.doc-btn.primary { background:var(--blue-500);color:var(--white);border-color:var(--blue-500); }
+.doc-btn.primary:hover { background:#2567c0; }
+.doc-btn svg { width:12px;height:12px; }
+.docs-empty { display:flex;flex-direction:column;align-items:center;gap:12px;
+              padding:48px 32px;color:var(--t3);text-align:center; }
+.docs-empty svg { width:40px;height:40px;color:var(--n-300); }
+.docs-empty-title { font-size:15px;font-weight:500;color:var(--t2); }
+.docs-empty-sub { font-size:13px;color:var(--t3); }
+.docs-footer { padding:16px 20px;border-top:1px solid var(--border);display:flex;
+               justify-content:flex-end;flex-shrink:0;background:var(--bg-page); }
+.docs-footer-close { padding:8px 20px;border-radius:var(--r8);font-size:14px;font-weight:500;
+                     font-family:var(--font);cursor:pointer;border:1px solid var(--border);
+                     background:var(--white);color:var(--t2);letter-spacing:var(--ls);
+                     transition:all .12s; }
+.docs-footer-close:hover { background:var(--bg-page);color:var(--t1); }
+
+/* ── SUCCESS TOAST ── */
+.toast { position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+         background: var(--t1); color: var(--white); border-radius: var(--r8);
+         padding: 12px 16px; font-size: 13px; font-weight: 500;
+         display: flex; align-items: center; gap: 8px; box-shadow: var(--sh-dropdown);
+         transform: translateY(80px); opacity: 0; transition: all .3s; pointer-events: none; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast svg { width: 16px; height: 16px; color: var(--ok-300); flex-shrink: 0; }
+
+/* ── MODAL SUCCESS SCREEN ── */
+.modal-success-view {
+  display: none; flex-direction: column; align-items: center;
+  padding: 40px 28px 32px; gap: 20px; text-align: center;
+  animation: fadeSlideUp .3s ease both;
+}
+.modal-success-view.show { display: flex; }
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Animated success circle */
+.success-ring-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; }
+.success-ring-wrap::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid var(--ok-200);
+  animation: ringPulse .7s ease-out forwards;
+}
+@keyframes ringPulse {
+  0%   { transform: scale(1);   opacity: .9; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+.success-circle {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--ok-50); border: 2px solid var(--ok-200);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  animation: circleAppear .3s ease both;
+}
+@keyframes circleAppear {
+  from { transform: scale(.75); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.check-path {
+  stroke-dasharray: 55; stroke-dashoffset: 55;
+  animation: drawCheck .45s cubic-bezier(.4,0,.2,1) forwards .2s;
+}
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+
+.success-title { font-size: 20px; font-weight: 700; color: var(--t1); letter-spacing: -.4px; }
+.success-sub { font-size: 14px; color: var(--t2); line-height: 21px; max-width: 320px; }
+.success-sub strong { color: var(--t1); }
+
+/* Summary card */
+.success-card {
+  width: 100%; background: var(--bg-page); border: 1px solid var(--border);
+  border-radius: var(--r8); padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 0;
+  text-align: left;
+}
+.success-card-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+}
+.success-card-row:last-child { border-bottom: none; }
+.sc-label { font-size: 12px; color: var(--t3); flex-shrink: 0; }
+.sc-val { font-size: 13px; font-weight: 500; color: var(--t1); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+.sc-val.blue { color: var(--blue-500); }
+
+/* Status chip inside card */
+.confirmed-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: var(--r99);
+  background: var(--ok-50); border: 1px solid var(--ok-200);
+  font-size: 12px; font-weight: 500; color: var(--ok-400);
+}
+.confirmed-chip svg { width: 10px; height: 10px; }
+
+/* Level chip */
+.level-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: var(--r99);
+  background: var(--info-50); border: 1px solid rgba(22,112,188,.2);
+  font-size: 11px; font-weight: 500; color: var(--info-400);
+}
+
+/* What's next strip */
+.success-next {
+  width: 100%; background: var(--blue-50); border: 1px solid rgba(46,119,215,.15);
+  border-radius: var(--r8); padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 10px; text-align: left;
+}
+.success-next svg { width: 16px; height: 16px; color: var(--blue-500); flex-shrink: 0; margin-top: 1px; }
+.success-next-text { font-size: 12px; color: var(--blue-500); line-height: 18px; }
+.success-next-text strong { font-weight: 600; display: block; margin-bottom: 1px; }
+
+.success-footer { width: 100%; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border); padding-top: 20px; margin-top: 4px; }
+
+/* ── BOTTOM BAR ── */
+.bottom-bar { display: flex; align-items: center; justify-content: center; gap: 6px;
+              padding: 12px 0 16px; font-size: 14px; color: #6b6b6b; }
+.bottom-bar strong { font-weight: 600; color: #323232; }
+.bottom-bar img { width: 17px; height: 18px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logomark">
+      <!-- Laptis gem icon -->
+      <svg class="nav-gem" viewBox="0 0 32 32" fill="none">
+        <path d="M16 3L28 11V21L16 29L4 21V11L16 3Z" fill="#2e77d7" opacity=".15"/>
+        <path d="M16 3L28 11V21L16 29L4 21V11L16 3Z" stroke="#2e77d7" stroke-width="1.5"/>
+        <path d="M16 8L22 13V19L16 24L10 19V13L16 8Z" fill="#2e77d7" opacity=".4"/>
+        <path d="M16 12L19 15V17L16 20L13 17V15L16 12Z" fill="#2e77d7"/>
+      </svg>
+      <span class="nav-wordmark">Laptis</span>
+    </div>
+    <div class="nav-collapse">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="7" height="18" rx="1"/><line x1="14" y1="6" x2="21" y2="6"/><line x1="14" y1="12" x2="21" y2="12"/><line x1="14" y1="18" x2="21" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="nav-divider"></div>
+  <div class="nav-group">
+    <div class="nav-item">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Program Finder</span>
+    </div>
+    <div class="nav-item parent">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-sub">
+      <div class="nav-sub-item active">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span>Manage Cases</span>
+      </div>
+      <div class="nav-sub-item">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Manage Referrals</span>
+      </div>
+    </div>
+  </div>
+  <div class="nav-bottom">
+    <div class="nav-divider"></div>
+    <div class="nav-help" onclick="openSupport()" style="cursor:pointer">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" width="16" height="16"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/><circle cx="12" cy="10" r="1"/></svg>
+      Need Help?
+    </div>
+    <div class="nav-profile">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="nav-avatar">AH</div>
+        <div>
+          <div class="nav-name">Alex Hemsworth</div>
+          <div class="nav-role">Admin</div>
+        </div>
+      </div>
+      <svg class="nav-arrow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main">
+  <!-- Page header -->
+  <div class="page-hdr">
+    <div class="page-title">Dashboard</div>
+    <div class="notif-btn">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div class="notif-badge">8</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab-item active">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+      Manage Cases
+    </div>
+    <div class="tab-item">
+      <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Manage Referrals
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <div class="search-icon"><svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+      <input class="search-input" type="text" placeholder="Search">
+      <button class="search-btn">Search</button>
+    </div>
+    <div class="toolbar-btns">
+      <button class="btn btn-ghost">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filters
+      </button>
+      <button class="btn btn-ghost">
+        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        Columns
+      </button>
+      <div class="divider-v"></div>
+      <button class="btn btn-primary">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Referral
+      </button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Index</th>
+          <th><div class="th-inner">Case ID <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th><div class="th-inner">Client <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th><div class="th-inner">Status <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th><div class="th-inner">Last Updated <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th><div class="th-inner">Exp. Discharge Date <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th><div class="th-inner">Created On <svg class="th-sort" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4"/><path d="M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1 — has Accepted referral -->
+        <tr>
+          <td>1</td>
+          <td><span class="case-id">CASE-C3D4 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span></td>
+          <td>Adam Turner</td>
+          <td class="status-cell">
+            <div class="ref-btn-wrap" id="rbw-1">
+              <button class="ref-btn" id="rb-1" onclick="toggleDropdown(1)">
+                View Referrals (4)
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="ref-btn-dot"></div>
+              <!-- DROPDOWN — has Accepted -->
+              <div class="ref-dropdown" id="dd-1">
+                <div class="accepted-notice">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  1 referral accepted — confirmation required
+                </div>
+                <div class="ref-dropdown-body">
+                  <div class="rd-col-prog">
+                    <div class="rd-row"><div class="rd-cell">Pathways Intensive Outpatient</div></div>
+                    <div class="rd-row"><div class="rd-cell bold">New Horizons Recovery Inst.</div></div>
+                    <div class="rd-row"><div class="rd-cell">Sunrise Recovery Program</div></div>
+                    <div class="rd-row"><div class="rd-cell">New Life Recovery Center</div></div>
+                  </div>
+                  <div class="rd-col-level">
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">Residential (3.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">Inpatient Detox (4.0)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                  </div>
+                  <div class="rd-col-status">
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Action Needed</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-accepted"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-update"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Update Requested</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-wait"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Waitlisted</span></div></div>
+                  </div>
+                </div>
+                <div class="rd-footer">
+                  <button class="rd-footer-btn rd-btn-submit" onclick="openDocs('CASE-C3D4','Adam Turner')" style="flex:none;color:var(--blue-500);border-color:var(--blue-500);">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    View Uploaded Docs
+                  </button>
+                  <button class="rd-footer-btn rd-btn-submit">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Submit Ready Referral
+                  </button>
+                  <button class="rd-footer-btn rd-btn-confirm" onclick="openModal('CASE-C3D4','Adam Turner')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    Confirm Acceptance
+                  </button>
+                  <button class="rd-footer-btn rd-btn-manage">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Manage Case →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>2 mins ago</td>
+          <td>Oct 06, 2025</td>
+          <td>Oct 09, 2025</td>
+          <td class="actions-cell"><div class="more-btn"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></div></td>
+        </tr>
+
+        <!-- Row 2 — has Accepted referral too -->
+        <tr>
+          <td>2</td>
+          <td><span class="case-id">CASE-A1B3 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span></td>
+          <td>John Doe</td>
+          <td class="status-cell">
+            <div class="ref-btn-wrap" id="rbw-2">
+              <button class="ref-btn" id="rb-2" onclick="toggleDropdown(2)">
+                View Referrals (4)
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="ref-btn-dot"></div>
+              <div class="ref-dropdown" id="dd-2">
+                <div class="accepted-notice">
+                  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                  2 referrals accepted — confirmation required
+                </div>
+                <div class="ref-dropdown-body">
+                  <div class="rd-col-prog">
+                    <div class="rd-row"><div class="rd-cell bold">Cedar Ridge Recovery</div></div>
+                    <div class="rd-row"><div class="rd-cell bold">Lakeside Treatment Ctr.</div></div>
+                    <div class="rd-row"><div class="rd-cell">Pine Valley Rehab</div></div>
+                    <div class="rd-row"><div class="rd-cell">Harbor Light Institute</div></div>
+                  </div>
+                  <div class="rd-col-level">
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">Residential (3.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">PHP (2.5)</span></div></div>
+                  </div>
+                  <div class="rd-col-status">
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-accepted"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-accepted"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Accepted</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-wait"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Waitlisted</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-pending"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Pending</span></div></div>
+                  </div>
+                </div>
+                <div class="rd-footer">
+                  <button class="rd-footer-btn rd-btn-submit" onclick="openDocs('CASE-A1B3','John Doe')" style="flex:none;color:var(--blue-500);border-color:var(--blue-500);">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    View Uploaded Docs
+                  </button>
+                  <button class="rd-footer-btn rd-btn-submit">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Submit Ready Referral
+                  </button>
+                  <button class="rd-footer-btn rd-btn-confirm" onclick="openModal('CASE-A1B3','John Doe')">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    Confirm Acceptance
+                  </button>
+                  <button class="rd-footer-btn rd-btn-manage">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Manage Case →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>2 hours ago</td>
+          <td>Oct 08, 2025</td>
+          <td>Oct 07, 2025</td>
+          <td class="actions-cell"><div class="more-btn"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></div></td>
+        </tr>
+
+        <!-- Row 3 — no accepted -->
+        <tr>
+          <td>3</td>
+          <td><span class="case-id">CASE-A1B2 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span></td>
+          <td>Emily Blunt</td>
+          <td class="status-cell">
+            <div class="ref-btn-wrap" id="rbw-3">
+              <button class="ref-btn" id="rb-3" onclick="toggleDropdown(3)">
+                View Referrals (6)
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="ref-btn-dot"></div>
+              <div class="ref-dropdown" id="dd-3">
+                <div class="ref-dropdown-body">
+                  <div class="rd-col-prog">
+                    <div class="rd-row"><div class="rd-cell">Pathways Intensive Outpatient</div></div>
+                    <div class="rd-row"><div class="rd-cell bold">New Horizons Recovery Inst.</div></div>
+                    <div class="rd-row"><div class="rd-cell">Sunrise Recovery Program</div></div>
+                    <div class="rd-row"><div class="rd-cell">New Life Recovery Center</div></div>
+                  </div>
+                  <div class="rd-col-level">
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">Residential (3.1)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">Inpatient Detox (4.0)</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="lvl-badge">IOP (2.1)</span></div></div>
+                  </div>
+                  <div class="rd-col-status">
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-action"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Action Needed</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-ready"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Ready</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-update"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>Update Requested</span></div></div>
+                    <div class="rd-row"><div class="rd-cell"><span class="status-badge sb-wait"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Waitlisted</span></div></div>
+                  </div>
+                </div>
+                <div class="rd-footer">
+                  <button class="rd-footer-btn rd-btn-submit" onclick="openDocs('CASE-A1B2','Emily Blunt')" style="flex:none;color:var(--blue-500);border-color:var(--blue-500);">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    View Uploaded Docs
+                  </button>
+                  <button class="rd-footer-btn rd-btn-submit">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    Submit Ready Referral
+                  </button>
+                  <button class="rd-footer-btn rd-btn-manage" style="flex:2">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Manage Case →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>12 days ago</td>
+          <td>Oct 07, 2025</td>
+          <td>Oct 10, 2025</td>
+          <td class="actions-cell"><div class="more-btn"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></div></td>
+        </tr>
+
+        <!-- Rows 4 & 5 — Closed -->
+        <tr>
+          <td>4</td>
+          <td><span class="case-id">CASE-I9J0 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span></td>
+          <td>Cecilia Hill</td>
+          <td><span class="closed-btn">Closed <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></td>
+          <td>20 days ago</td><td>Oct 09, 2025</td><td>Oct 08, 2025</td>
+          <td class="actions-cell"><div class="more-btn"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></div></td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td><span class="case-id">CASE-G7H8 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span></td>
+          <td>Turner Gray</td>
+          <td><span class="closed-btn">Closed <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></td>
+          <td>22 days ago</td><td>Oct 06, 2025</td><td>Oct 06, 2025</td>
+          <td class="actions-cell"><div class="more-btn"><svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg></div></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="tbl-footer">
+      <span class="tbl-footer-text">5 total cases</span>
+      <span class="tbl-footer-link">Learn more about case and referral statuses <a href="#">here</a></span>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    powered by
+    <svg width="17" height="18" viewBox="0 0 32 32" fill="none"><path d="M16 3L28 11V21L16 29L4 21V11L16 3Z" fill="#2e77d7" opacity=".3"/><path d="M16 3L28 11V21L16 29L4 21V11L16 3Z" stroke="#2e77d7" stroke-width="1.5"/><path d="M16 12L19 15V17L16 20L13 17V15L16 12Z" fill="#2e77d7"/></svg>
+    <strong>Laptis</strong>
+  </div>
+</div><!-- /main -->
+</div><!-- /shell -->
+
+<!-- ══ CONFIRM ACCEPTANCE MODAL ══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+
+    <!-- ── FORM VIEW ── -->
+    <div id="modal-form-view">
+      <div class="modal-hdr">
+        <div class="modal-hdr-left">
+          <div class="modal-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="modal-title">Confirm Acceptance</div>
+            <div class="modal-subtitle" id="modal-subtitle">Select the program you'd like to confirm for this referral.</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Case info pill -->
+        <div id="modal-case-pill" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-page);border:1px solid var(--border);border-radius:var(--r8);">
+          <svg width="14" height="14" fill="none" stroke="var(--t3)" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          <span style="font-size:13px;font-weight:500;color:var(--blue-500)" id="modal-case-id">CASE-C3D4</span>
+          <span style="font-size:13px;color:var(--t3)">·</span>
+          <span style="font-size:13px;color:var(--t2)" id="modal-client-name">Adam Turner</span>
+        </div>
+
+        <!-- Program dropdown -->
+        <div>
+          <div class="field-label">Select program to confirm<span>*</span></div>
+          <div class="custom-select" id="custom-select">
+            <button class="select-btn" id="select-btn" onclick="toggleSelect()">
+              <span class="select-value" id="select-value">
+                <span class="select-placeholder">Choose an accepted program…</span>
+              </span>
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="select-dropdown" id="select-dropdown">
+              <!-- Options injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Callout (shown when selection made) -->
+        <div class="modal-callout" id="modal-callout" style="display:none">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <span id="callout-text">Confirming acceptance will notify <strong>New Horizons Recovery Institute</strong> and update the referral status for this case.</span>
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <div class="field-label">Notes <span style="color:var(--t3);font-weight:400">(optional)</span></div>
+          <textarea class="modal-textarea" id="modal-notes" placeholder="Add any notes for this acceptance confirmation…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-confirm-modal" id="confirm-btn" onclick="confirmAcceptance()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm Acceptance
+        </button>
+      </div>
+    </div><!-- /form-view -->
+
+    <!-- ── SUCCESS VIEW ── -->
+    <div class="modal-success-view" id="modal-success-view">
+
+      <!-- Animated checkmark -->
+      <div class="success-ring-wrap">
+        <div class="success-circle">
+          <svg width="36" height="36" fill="none" stroke="var(--ok-400)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <polyline class="check-path" points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Title + sub -->
+      <div>
+        <div class="success-title">Acceptance Confirmed!</div>
+        <div class="success-sub" id="success-sub" style="margin-top:6px">
+          The referral for <strong id="success-program-name">—</strong> has been confirmed. The program will be notified shortly.
+        </div>
+      </div>
+
+      <!-- Summary card -->
+      <div class="success-card">
+        <div class="success-card-row">
+          <span class="sc-label">Program</span>
+          <span class="sc-val" id="sc-program">—</span>
+        </div>
+        <div class="success-card-row">
+          <span class="sc-label">Level of care</span>
+          <span class="sc-val"><span class="level-chip" id="sc-level">—</span></span>
+        </div>
+        <div class="success-card-row">
+          <span class="sc-label">Case</span>
+          <span class="sc-val blue" id="sc-case">—</span>
+        </div>
+        <div class="success-card-row">
+          <span class="sc-label">Client</span>
+          <span class="sc-val" id="sc-client">—</span>
+        </div>
+        <div class="success-card-row">
+          <span class="sc-label">Referral status</span>
+          <span class="confirmed-chip">
+            <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            Confirmed
+          </span>
+        </div>
+      </div>
+
+      <!-- What's next -->
+      <div class="success-next">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="success-next-text">
+          <strong>What happens next?</strong>
+          <strong id="success-program-name-next">The program</strong> will receive a notification and the case status will update to <strong>Confirmed</strong> across your dashboard.
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="success-footer">
+        <button class="btn btn-ghost" onclick="closeModal()" style="color:var(--t2)">View Case</button>
+        <button class="btn btn-success" onclick="closeModal()">Done</button>
+      </div>
+
+    </div><!-- /success-view -->
+
+  </div><!-- /modal -->
+</div>
+
+<!-- Success toast -->
+<div class="toast" id="toast">
+  <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-text">Acceptance confirmed successfully</span>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────
+const ACCEPTED = {
+  1: [
+    { id: 'p1', name: 'New Horizons Recovery Institute', level: 'Residential (3.1)' },
+  ],
+  2: [
+    { id: 'p2', name: 'Cedar Ridge Recovery', level: 'Residential (3.1)' },
+    { id: 'p3', name: 'Lakeside Treatment Center', level: 'IOP (2.1)' },
+  ]
+};
+
+let openDropdownId = null;
+let currentCaseRow = null;
+let selectedProgram = null;
+
+// ── Dropdown toggle ───────────────────────────────────────
+function toggleDropdown(id) {
+  const dd = document.getElementById(`dd-${id}`);
+  const btn = document.getElementById(`rb-${id}`);
+  if (openDropdownId && openDropdownId !== id) {
+    closeDropdown(openDropdownId);
+  }
+  const isOpen = dd.classList.contains('open');
+  if (isOpen) { closeDropdown(id); }
+  else {
+    dd.classList.add('open');
+    btn.classList.add('open');
+    openDropdownId = id;
+  }
+}
+function closeDropdown(id) {
+  const dd = document.getElementById(`dd-${id}`);
+  const btn = document.getElementById(`rb-${id}`);
+  if (dd) dd.classList.remove('open');
+  if (btn) btn.classList.remove('open');
+  if (openDropdownId === id) openDropdownId = null;
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.ref-btn-wrap') && !e.target.closest('.modal')) {
+    if (openDropdownId) closeDropdown(openDropdownId);
+  }
+});
+
+// ── Modal ─────────────────────────────────────────────────
+function openModal(caseId, clientName) {
+  // find row index
+  const rowNum = caseId === 'CASE-C3D4' ? 1 : 2;
+  currentCaseRow = rowNum;
+  selectedProgram = null;
+
+  document.getElementById('modal-case-id').textContent = caseId;
+  document.getElementById('modal-client-name').textContent = clientName;
+  document.getElementById('modal-subtitle').textContent =
+    `Select the program you'd like to confirm acceptance for — ${clientName}.`;
+
+  // Build options
+  const opts = ACCEPTED[rowNum] || [];
+  const dd = document.getElementById('select-dropdown');
+  dd.innerHTML = opts.map(p => `
+    <div class="select-option" data-id="${p.id}" data-name="${p.name}" data-level="${p.level}" onclick="selectProgram(this)">
+      <div class="opt-left">
+        <span class="opt-name">${p.name}</span>
+        <span class="opt-level">${p.level}</span>
+      </div>
+      <span class="opt-badge">
+        <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Accepted
+      </span>
+    </div>
+  `).join('');
+
+  // Reset form/success state
+  resetSelectBtn();
+  document.getElementById('modal-callout').style.display = 'none';
+  document.getElementById('confirm-btn').classList.remove('enabled');
+  document.getElementById('modal-notes').value = '';
+
+  const formView    = document.getElementById('modal-form-view');
+  const successView = document.getElementById('modal-success-view');
+  formView.style.display   = '';
+  formView.style.opacity   = '1';
+  formView.style.transition = '';
+  successView.classList.remove('show');
+  successView.style.display = 'none';
+
+  document.getElementById('modal-overlay').classList.add('open');
+
+  if (openDropdownId) closeDropdown(openDropdownId);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  closeSelectDropdown();
+  // Reset to form view after close animation
+  setTimeout(() => {
+    document.getElementById('modal-form-view').style.display = '';
+    const sv = document.getElementById('modal-success-view');
+    sv.classList.remove('show');
+    sv.style.display = 'none';
+  }, 250);
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ── Custom select ─────────────────────────────────────────
+function toggleSelect() {
+  const btn = document.getElementById('select-btn');
+  const dd = document.getElementById('select-dropdown');
+  const isOpen = dd.classList.contains('open');
+  btn.classList.toggle('open', !isOpen);
+  dd.classList.toggle('open', !isOpen);
+}
+function closeSelectDropdown() {
+  document.getElementById('select-btn').classList.remove('open');
+  document.getElementById('select-dropdown').classList.remove('open');
+}
+function selectProgram(el) {
+  const name = el.dataset.name;
+  const level = el.dataset.level;
+  selectedProgram = { name, level };
+
+  // Update button display
+  const val = document.getElementById('select-value');
+  val.innerHTML = `
+    <span style="font-weight:500;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</span>
+    <span class="select-badge"><svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>${level}</span>
+  `;
+
+  // Mark selected
+  document.querySelectorAll('.select-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  closeSelectDropdown();
+
+  // Show callout
+  document.getElementById('callout-text').innerHTML =
+    `Confirming acceptance will notify <strong>${name}</strong> and update the referral status to <strong>Confirmed</strong> in this case.`;
+  document.getElementById('modal-callout').style.display = 'flex';
+
+  // Enable confirm button
+  document.getElementById('confirm-btn').classList.add('enabled');
+}
+function resetSelectBtn() {
+  document.getElementById('select-value').innerHTML =
+    `<span class="select-placeholder">Choose an accepted program…</span>`;
+}
+
+// ── Confirm ───────────────────────────────────────────────
+function confirmAcceptance() {
+  if (!selectedProgram) return;
+
+  const caseId     = document.getElementById('modal-case-id').textContent;
+  const clientName = document.getElementById('modal-client-name').textContent;
+
+  // Populate success view
+  document.getElementById('success-program-name').textContent      = selectedProgram.name;
+  document.getElementById('success-program-name-next').textContent = selectedProgram.name;
+  document.getElementById('sc-program').textContent = selectedProgram.name;
+  document.getElementById('sc-level').textContent   = selectedProgram.level;
+  document.getElementById('sc-case').textContent    = caseId;
+  document.getElementById('sc-client').textContent  = clientName;
+
+  // Swap views with a smooth fade
+  const formView    = document.getElementById('modal-form-view');
+  const successView = document.getElementById('modal-success-view');
+
+  formView.style.transition = 'opacity .18s';
+  formView.style.opacity    = '0';
+
+  setTimeout(() => {
+    formView.style.display = 'none';
+    successView.style.display = 'flex'; // trigger display before class for animation
+    requestAnimationFrame(() => successView.classList.add('show'));
+  }, 180);
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// Close select when clicking outside modal
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#custom-select')) closeSelectDropdown();
+});
+
+// ── View Uploaded Documents modal ────────────────────────────
+const DOCS_DATA = {
+  'CASE-C3D4': [
+    { name: 'Insurance Card — Beacon Health Options.pdf', type: 'pdf', category: 'Insurance', uploadedBy: 'Adam Turner', date: 'Mar 04, 2025', size: '1.2 MB' },
+    { name: 'Government-Issued Photo ID.jpg',             type: 'img', category: 'Identification', uploadedBy: 'Adam Turner', date: 'Mar 04, 2025', size: '843 KB' },
+    { name: 'Clinical Assessment Report.pdf',            type: 'pdf', category: 'Clinical',      uploadedBy: 'Alex Hemsworth', date: 'Mar 05, 2025', size: '3.7 MB' },
+  ],
+  'CASE-A1B3': [
+    { name: 'Insurance Card — UnitedHealth Group.pdf',   type: 'pdf', category: 'Insurance',     uploadedBy: 'John Doe',       date: 'Feb 28, 2025', size: '892 KB' },
+    { name: 'State-Issued Photo ID.jpg',                 type: 'img', category: 'Identification', uploadedBy: 'John Doe',       date: 'Feb 28, 2025', size: '1.1 MB' },
+    { name: 'Prior Authorization Letter.pdf',            type: 'pdf', category: 'Authorization',  uploadedBy: 'Alex Hemsworth', date: 'Mar 01, 2025', size: '215 KB' },
+    { name: 'Intake Assessment Form.docx',               type: 'doc', category: 'Clinical',       uploadedBy: 'Tim Hall',       date: 'Mar 02, 2025', size: '128 KB' },
+  ],
+  'CASE-A1B2': [
+    { name: 'Insurance Card — Aetna.pdf',                type: 'pdf', category: 'Insurance',     uploadedBy: 'Emily Blunt',    date: 'Jan 15, 2025', size: '764 KB' },
+    { name: "Driver's License Scan.jpg",                 type: 'img', category: 'Identification', uploadedBy: 'Emily Blunt',    date: 'Jan 15, 2025', size: '2.3 MB' },
+  ],
+};
+
+const DOC_ICONS = {
+  pdf: `<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`,
+  img: `<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+  doc: `<svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>`,
+};
+
+function openDocs(caseId, clientName) {
+  document.getElementById('docs-case-id').textContent    = caseId;
+  document.getElementById('docs-client-name').textContent = clientName;
+  const docs = DOCS_DATA[caseId] || [];
+  const body = document.getElementById('docs-body');
+  if (docs.length === 0) {
+    body.innerHTML = `<div class="docs-empty">
+      <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <div class="docs-empty-title">No documents uploaded yet</div>
+      <div class="docs-empty-sub">Documents uploaded for this case will appear here.</div>
+    </div>`;
+  } else {
+    body.innerHTML = `<div class="docs-count">${docs.length} document${docs.length !== 1 ? 's' : ''} attached</div>` +
+      docs.map(d => `<div class="doc-row">
+        <div class="doc-icon ${d.type}">${DOC_ICONS[d.type] || DOC_ICONS.doc}</div>
+        <div class="doc-info">
+          <div class="doc-name">${d.name}</div>
+          <div class="doc-meta">
+            <span class="doc-type-pill">${d.category}</span>
+            <span class="doc-meta-dot"></span>
+            <span>Uploaded by ${d.uploadedBy}</span>
+            <span class="doc-meta-dot"></span>
+            <span>${d.date}</span>
+            <span class="doc-meta-dot"></span>
+            <span>${d.size}</span>
+          </div>
+        </div>
+        <div class="doc-actions">
+          <button class="doc-btn">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            View
+          </button>
+          <button class="doc-btn primary">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download
+          </button>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('docs-overlay').classList.add('open');
+}
+function closeDocs() {
+  document.getElementById('docs-overlay').classList.remove('open');
+}
+
+// ── Support modal ────────────────────────────────────────────
+function openSupport() {
+  document.getElementById('support-overlay').classList.add('open');
+}
+function closeSupport() {
+  document.getElementById('support-overlay').classList.remove('open');
+}
+</script>
+
+<!-- ══ VIEW UPLOADED DOCUMENTS MODAL ══ -->
+<div class="docs-overlay" id="docs-overlay" onclick="if(event.target===this)closeDocs()">
+  <div class="docs-modal">
+    <div class="docs-hdr">
+      <div class="docs-hdr-left">
+        <div class="docs-title">Uploaded Documents</div>
+        <div class="docs-case-chip">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+          <span id="docs-case-id">CASE-C3D4</span>
+          <span style="color:var(--info-200)">·</span>
+          <span id="docs-client-name">Adam Turner</span>
+        </div>
+      </div>
+      <div class="docs-close" onclick="closeDocs()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="docs-body" id="docs-body"></div>
+    <div class="docs-footer">
+      <button class="docs-footer-close" onclick="closeDocs()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SUPPORT MODAL ══ -->
+<div class="support-overlay" id="support-overlay" onclick="if(event.target===this)closeSupport()">
+  <div class="support-modal">
+    <div class="support-hdr">
+      <div>
+        <div class="support-title">How Can We Help?</div>
+        <div class="support-sub">We're here to support you. Choose the option that works best for you.</div>
+      </div>
+      <div class="support-close" onclick="closeSupport()">
+        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="support-grid">
+
+      <a class="support-card" href="tel:6172130356">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.88 10.4a19.79 19.79 0 01-3.07-8.68A2 2 0 012.79 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.76a16 16 0 006.29 6.29l1.12-1.12a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="support-card-title">Give Us a Call</div>
+          <div class="support-card-desc">617-213-0356</div>
+        </div>
+      </a>
+
+      <a class="support-card" href="mailto:hello@laptis.io">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="support-card-title">Send Us an Email</div>
+          <div class="support-card-desc">hello@laptis.io</div>
+        </div>
+      </a>
+
+      <a class="support-card" href="#" onclick="closeSupport();return false;">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+            <line x1="9" y1="10" x2="15" y2="10" opacity=".6"/>
+            <line x1="9" y1="14" x2="13" y2="14" opacity=".6"/>
+          </svg>
+        </div>
+        <div>
+          <div class="support-card-title">Share Feedback</div>
+          <div class="support-card-desc">Tell us what you think</div>
+        </div>
+      </a>
+
+      <a class="support-card" href="#" onclick="closeSupport();return false;">
+        <div class="support-card-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+            <line x1="9" y1="7" x2="15" y2="7" opacity=".5"/>
+            <line x1="9" y1="11" x2="15" y2="11" opacity=".5"/>
+          </svg>
+        </div>
+        <div>
+          <div class="support-card-title">Help Center</div>
+          <div class="support-card-desc">Browse guides &amp; FAQs</div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
